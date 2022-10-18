@@ -10,5 +10,5 @@ Projekteinteilung: A2
 Projektplan /-ideen:
 1. Vervollständigen des Programms für WF in periodischen Potentialen
 2. Plot von Eigenwerten gegen Potentialtiefe und -anzahl
-3. 
+3. Entwicklung einer GUI in TKinter
 
