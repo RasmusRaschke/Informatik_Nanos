@@ -8,6 +8,7 @@ Pflichtbetreuung (vier Termine):
 -> 4 Leistungspunkte übrig -> ca. vier Wochen Arbeitszeit ist Rahmen für das Projekt (4 * 30 h)
 Projekteinteilung: A2
 Projektplan /-ideen:
+--- Vor Treffen mit Tomke: Analytische Lösungen und Theorie kennen! ---
 1. Vervollständigen des Programms für WF in periodischen Potentialen
 2. Plot von Eigenwerten gegen Potentialtiefe und -anzahl
 3. Entwicklung einer GUI in TKinter (eventuell embedded webserver in HTML/CSS und JavaScript -> Webpage)
