@@ -7,6 +7,7 @@ Pflichtbetreuung (vier Termine):
 -> Jederzeit mehr Termine buchbar; Termine auf Eigeninitiative hin buchen
 -> 4 Leistungspunkte übrig -> ca. vier Wochen Arbeitszeit ist Rahmen für das Projekt (4 * 30 h)
 Projekteinteilung: A2
-
+Projektplan /-ideen:
+1. Vervollständigen des Programms für WF in periodischen Potentialen
 
 
