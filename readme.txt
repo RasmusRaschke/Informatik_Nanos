@@ -11,4 +11,5 @@ Projektplan /-ideen:
 1. Vervollständigen des Programms für WF in periodischen Potentialen
 2. Plot von Eigenwerten gegen Potentialtiefe und -anzahl
 3. Entwicklung einer GUI in TKinter (eventuell embedded webserver in HTML/CSS und JavaScript -> Webpage)
-
+4. Wenn Zeit: Elektrisches Feld an Kristall anlegen
+5. Wenn Zeit: Rechenintensive Schritte in C/C++ auslagern; Bindings erstellen
