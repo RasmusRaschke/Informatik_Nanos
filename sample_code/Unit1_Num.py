@@ -47,6 +47,7 @@ def Num_DGL(K,U0,U1,Delta_X,N):# Definiere eine Prozedur um mit dem Numerov -Ver
     return Werte_U
 
 
+
 # Parameter - global
 
 Steps = 1000 # Schritte
