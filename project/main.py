@@ -122,17 +122,28 @@ def norm(u):
         """
     sum_ = 0
     u_norm = []
-    '''
-    K_list = get_k(v, E)
-    wv_eigen = numerov(u_0, u_1, K, counter, x_min, x_max, N)
-    '''
     for i in range(len(u)):
         sum_ = u[i]**2 + sum_
-    print("Summe = ", sum_)
     for i in range(len(u)):
         u_norm.append(u[i] / np.sqrt(sum_))
-    print(u_norm)
     return u_norm
+
+def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
+    energies = []
+    eigen = []
+    last = []
+    n = abs(round((e_max - e_min) / accuracy))
+    for i in range(n):
+        energy = e_min + i * accuracy
+        K = get_k(v, energy)
+        psi = numerov(u_0, u_1, K, counter, x_min, x_max, N)
+        last.append(psi[-1])
+        energies.append(energy)
+    for i in range(1, len(energies)):
+        if np.sign(last[i-1]) != np.sign(last[i]):
+            energy = (i * accuracy - 0.5 * accuracy) + e_min
+            eigen.append(energy)
+    return(eigen)
 
 
 def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, energy, accuracy, start):
@@ -155,31 +166,12 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, energy, acc
     print(e_new)
     return e_new
 
-#Diese Funktion ist nur zum Test 1 zu 1 aus eurer Vorlesung entnommen. In der finalen Version wird nur eigener Code
-#eingesetzt.
-def Nullstellensuche_Simple(u_0, u_1, x_min, x_max, N, v, E_0, E_max, accuracy, counter):
-    Energie_Eigenwerte = []
-    Last_Val = []
-    N_E = round((E_max - E_0) / accuracy)
-    E_list = []
-    print("Eigenwertsuche in äquidistanten Energieschritten von (eV)")
-    print(accuracy)
-    print("Anzahl der Schritte: ", N_E)
-    for i in range(N_E):
-        Energie = i * accuracy + E_0
-        K = get_k(v, Energie)
-        wave = numerov(u_0, u_1, K, counter, x_min, x_max, N)
-        Last_Val.append(wave[counter - 1])
-        E_list.append(Energie)
-    for i in range(1, N_E):
-        if np.sign(Last_Val[i - 1]) != np.sign(Last_Val[i]):
-            print("Nullstelle gefunden bei :")
-            E_est = (i * accuracy - 0.5 * accuracy) + E_0
-            print(E_est)
-            Energie_Eigenwerte.append(E_est)
-    return Energie_Eigenwerte, Last_Val
-
-
+def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, zeros):
+    eigen_correct = []
+    for i in range(len(zeros)):
+        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, zeros[i], accuracy, start)
+        eigen_correct.append(e)
+    return eigen_correct
 
 ########################################################################################################################
 #Variablen hier
@@ -195,33 +187,34 @@ u_0 = .0
 u_1 = .01
 max_bound = 1000000
 accuracy = 0.001
-start = 0.1
+start = 0.01
 E_0 = -1
 E_max = 0
+e_min = -2
+e_max = 0
 ########################################################################################################################
 #Berechnung
 x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, wells)
 print(counter)
-#eigen = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, E_0, accuracy, start)
-eigen_simple, last = Nullstellensuche_Simple(u_0, u_1, x_min, x_max, N, v, E_0, E_max, accuracy, counter)
-#K = get_k(v, eigen)
-#psi = numerov(u_0, u_1, K, counter, x_min, x_max, N)
-K1 = get_k(v, eigen_simple[0])
+eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy)
+eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_simple)
+print("Einfacher Wert:", eigen_simple)
+print("Genauer Wert:", eigen_correct)
+K1 = get_k(v, eigen_correct[0])
 psi1 = numerov(u_0, u_1, K1, counter, x_min, x_max, N)
-K2 = get_k(v, eigen_simple[1])
+K2 = get_k(v, eigen_correct[1])
 psi2 = numerov(u_0, u_1, K2, counter, x_min, x_max, N)
-K3 = get_k(v, eigen_simple[2])
+K3 = get_k(v, eigen_correct[2])
 psi3 = numerov(u_0, u_1, K3, counter, x_min, x_max, N)
-plt.plot(x, psi1)
-plt.plot(x, psi2)
-plt.plot(x, psi3)
+plt.plot(x, norm(psi1))
+plt.plot(x, norm(psi2))
+plt.plot(x, norm(psi3))
 plt.show()
 ########################################################################################################################
 #Plot
 fig, ax = plt.subplots()
 ax.plot(dpi=300)
 ax.plot(x, v)
-#ax.plot(x, get_k(v, -E))
-ax.plot(x, norm(psi1))
+ax.plot(x, norm(psi2))
 plt.show()
 
