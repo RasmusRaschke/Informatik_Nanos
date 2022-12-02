@@ -181,7 +181,7 @@ L = 5
 N = 1000
 x_min = 0
 x_max = 10
-wells = 1
+wells = 2
 E = 1.
 u_0 = .0
 u_1 = .01
@@ -215,6 +215,6 @@ plt.show()
 fig, ax = plt.subplots()
 ax.plot(dpi=300)
 ax.plot(x, v)
-ax.plot(x, norm(psi2))
+ax.plot(x, norm(psi1))
 plt.show()
 
