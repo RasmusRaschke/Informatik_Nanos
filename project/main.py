@@ -129,6 +129,36 @@ def norm(u):
     return u_norm
 
 def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
+    """cheap method to find zeros in wavefunction by sign change
+
+        Parameters
+        ----------
+        u_0 : float
+            first boundary value
+        u_1 : float
+            second fixed point for numerov algorithm
+        v : float list
+            potential well defined as 1-D array
+        counter : int
+            uses counter (=len(v)) to make sure that index range is conserved when using a variable amount of wells
+        x_min : float
+            start of x-axis
+        x_max : float
+            end of x-axis
+        N : int
+            number of steps
+        e_min : float
+            starting point for energy search
+        e_max : float
+            ending point for energy search
+        accuracy: float
+            accuracy of search for zeros
+
+        Returns
+        -------
+        eigen : float list
+            rough eigenenergies of the wave function
+        """
     energies = []
     eigen = []
     last = []
@@ -143,12 +173,44 @@ def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
         if np.sign(last[i-1]) != np.sign(last[i]):
             energy = (i * accuracy - 0.5 * accuracy) + e_min
             eigen.append(energy)
-    return(eigen)
+    return eigen
 
 
-def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, energy, accuracy, start):
-    e = energy
-    de = start
+def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate, accuracy, differential):
+    """algorithm to increase the accuracy of found zeros
+
+        Parameters
+        ----------
+        u_0 : float
+            first boundary value
+        u_1 : float
+            second fixed point for numerov algorithm
+        counter : int
+            uses counter (=len(v)) to make sure that index range is conserved when using a variable amount of wells
+        x_min : float
+            start of x-axis
+        x_max : float
+            end of x-axis
+        N : int
+            number of steps
+        v : float list
+            potential well defined as 1-D array
+        max_bound : int
+            maximal amount of iterations if control doesn't get low enough
+        eigen_estimate : float
+            eigenenergy from the inaccurate method
+        accuracy : float
+            convergence criterium for zeros
+        differential : float
+            first step to calculate the new energy
+
+        Returns
+        -------
+        e_new : float list
+            nearly exact eigenenergies of the wave function
+        """
+    e = eigen_estimate
+    de = differential
     for i in range(max_bound):
         K = get_k(v, e)
         psi_1 = numerov(u_0, u_1, K, counter, x_min, x_max, N)
@@ -166,27 +228,95 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, energy, acc
     print(e_new)
     return e_new
 
-def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, zeros):
-    eigen_correct = []
-    for i in range(len(zeros)):
-        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, zeros[i], accuracy, start)
-        eigen_correct.append(e)
-    return eigen_correct
+def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, differential, eigen_estimate):
+    """algorithm to increase the accuracy of found zeros
 
+        Parameters
+        ----------
+        u_0 : float
+            first boundary value
+        u_1 : float
+            second fixed point for numerov algorithm
+        counter : int
+            uses counter (=len(v)) to make sure that index range is conserved when using a variable amount of wells
+        x_min : float
+            start of x-axis
+        x_max : float
+            end of x-axis
+        N : int
+            number of steps
+        v : float list
+            potential well defined as 1-D array
+        max_bound : int
+            maximal amount of iterations if control doesn't get low enough
+        accuracy : float
+            convergence criterium for zeros
+        differential : float
+            first step to calculate the new energy
+        eigen_estimate : float
+            eigenenergy from the inaccurate method
+
+        Returns
+        -------
+        eigen_corrected : float list
+            nearly exact eigenenergies of the wave function
+        """
+    eigen_corrected = []
+    for i in range(len(eigen_estimate)):
+        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate[i], accuracy, differential)
+        eigen_corrected.append(e)
+    return eigen_corrected
+
+
+def truncate(u, factor):
+    maximum = max(u)
+    limit = maximum / factor
+    for i in range(len(u)):
+        if abs(u[i]) < limit:
+            u[i] = 0
+    return u
+
+
+def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max, accuracy, max_bound, start):
+    x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, wells)
+    eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy)
+    eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_simple)
+    return eigen_correct, x, v, counter
+
+
+def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N):
+    fig, ax = plt.subplots()
+    ax.plot(dpi=300)
+    ax.plot(x, v)
+    ax2 = ax.twinx()
+    for i in range(len(eigen_correct)):
+        K = get_k(v, eigen_correct[i])
+        wave = numerov(u_0, u_1, K, counter, x_min, x_max, N)
+        ax2.plot(x, norm(wave), label=r"$\psi_{%i}$"%(i+1))
+    plt.grid(True)
+    ax.set_xlabel(r'x in $[nm]$')
+    ax2.spines['right'].set_color('red')
+    ax2.tick_params(axis='y', colors='red')
+    plt.legend()
+    plt.show()
+
+
+def plot_bands():
+    pass
 ########################################################################################################################
 #Variablen hier
-v_0 = 1
+v_0 = 0.3
 x_0 = 2
-L = 5
+L = 3
 N = 1000
 x_min = 0
 x_max = 10
-wells = 2
+wells = 50
 E = 1.
 u_0 = .0
 u_1 = .01
 max_bound = 1000000
-accuracy = 0.001
+accuracy = 0.00001
 start = 0.01
 E_0 = -1
 E_max = 0
@@ -194,27 +324,10 @@ e_min = -2
 e_max = 0
 ########################################################################################################################
 #Berechnung
-x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, wells)
-print(counter)
-eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy)
-eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_simple)
-print("Einfacher Wert:", eigen_simple)
-print("Genauer Wert:", eigen_correct)
-K1 = get_k(v, eigen_correct[0])
-psi1 = numerov(u_0, u_1, K1, counter, x_min, x_max, N)
-K2 = get_k(v, eigen_correct[1])
-psi2 = numerov(u_0, u_1, K2, counter, x_min, x_max, N)
-K3 = get_k(v, eigen_correct[2])
-psi3 = numerov(u_0, u_1, K3, counter, x_min, x_max, N)
-plt.plot(x, norm(psi1))
-plt.plot(x, norm(psi2))
-plt.plot(x, norm(psi3))
-plt.show()
-########################################################################################################################
-#Plot
-fig, ax = plt.subplots()
-ax.plot(dpi=300)
-ax.plot(x, v)
-ax.plot(x, norm(psi1))
-plt.show()
+eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                     accuracy, max_bound, start)
+plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N)
+
+
+
 
