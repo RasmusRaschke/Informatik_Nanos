@@ -74,7 +74,7 @@ def get_k(v, E):
         k.append(- (v[i] - E) * 26.27)
     return k
 
-def numerov(u_0, u_1, K, counter, x_min, x_max, N):
+def numerov(u_0, u_1, K, counter, x_min, x_max):
     """Apply numerov algorithm to solve separated SEQ
 
     Parameters
@@ -91,8 +91,6 @@ def numerov(u_0, u_1, K, counter, x_min, x_max, N):
         start of x-axis
     x_max : float
         end of x-axis
-    N : int
-        number of steps
 
     Returns
     -------
@@ -166,7 +164,7 @@ def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
     for i in range(n):
         energy = e_min + i * accuracy
         K = get_k(v, energy)
-        psi = numerov(u_0, u_1, K, counter, x_min, x_max, N)
+        psi = numerov(u_0, u_1, K, counter, x_min, x_max)
         last.append(psi[-1])
         energies.append(energy)
     for i in range(1, len(energies)):
@@ -213,10 +211,10 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
     de = differential
     for i in range(max_bound):
         K = get_k(v, e)
-        psi_1 = numerov(u_0, u_1, K, counter, x_min, x_max, N)
+        psi_1 = numerov(u_0, u_1, K, counter, x_min, x_max)
         psi_max = psi_1[-1]
         K = get_k(v, e + de)
-        psi_2 = numerov(u_0, u_1, K, counter, x_min, x_max, N)
+        psi_2 = numerov(u_0, u_1, K, counter, x_min, x_max)
         psi_max_de = psi_2[-1]
         de_new = - psi_max / ((psi_max_de - psi_max) / de)
         e_new = e + de_new
@@ -228,7 +226,7 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
     print(e_new)
     return e_new
 
-def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, differential, eigen_estimate):
+def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_estimate):
     """algorithm to increase the accuracy of found zeros
 
         Parameters
@@ -251,7 +249,7 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, di
             maximal amount of iterations if control doesn't get low enough
         accuracy : float
             convergence criterium for zeros
-        differential : float
+        start : float
             first step to calculate the new energy
         eigen_estimate : float
             eigenenergy from the inaccurate method
@@ -263,12 +261,13 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, di
         """
     eigen_corrected = []
     for i in range(len(eigen_estimate)):
-        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate[i], accuracy, differential)
+        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate[i], accuracy, start)
         eigen_corrected.append(e)
     return eigen_corrected
 
 
 def truncate(u, factor):
+    #ask in next meeting about how this should look
     maximum = max(u)
     limit = maximum / factor
     for i in range(len(u)):
@@ -278,6 +277,50 @@ def truncate(u, factor):
 
 
 def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max, accuracy, max_bound, start):
+    """Calculate accurate eigenvalues with NR-algorithm
+
+        Parameters
+        ----------
+        v_0 : float
+            depth of potential wells in eV; inverse wells (walls) aren't supported right now
+        x_0 : float
+            point where the first well begins
+        u_0 : float
+            first boundary value
+        u_1 : float
+            second fixed point for numerov algorithm
+        L : float
+            width of the well
+        N : int
+            steps for resolution
+        x_min : float
+            start of x-axis
+        x_max : float
+            end of x-axis
+        wells : int, optional
+            number of equally spaced wells, default = 1
+        e_min : float
+            starting point for energy search
+        e_max : float
+            ending point for energy search
+        accuracy : float
+            accuracy of search for zeros
+        max_bound : int
+            maximal amount of iterations if control doesn't get low enough
+        start : float
+            first step to calculate the new energy
+
+        Returns
+        -------
+        eigen_correct : float list
+            list of eigenenergies in [eV]
+        x : float list
+            x-axis in nm
+        v : float list
+            1-D potential array
+        counter : int
+            returns len of v and x
+        """
     x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, wells)
     eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy)
     eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_simple)
@@ -285,6 +328,30 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
 
 
 def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N):
+    """Calculate and plot eigenstates with given eigenenergies
+
+            Parameters
+            ----------
+            x : float list
+                x-axis in nm
+            v : float list
+                1-D potential array
+            eigen_correct : float list
+                list of eigenenergies in [eV]
+            u_0 : float
+                first boundary value
+            u_1 : float
+                second fixed point for numerov algorithm
+            x_min : float
+                start of x-axis
+            x_max : float
+                end of x-axis
+            N : int
+                steps for resolution
+
+            Returns
+            -------
+            """
     fig, ax = plt.subplots()
     ax.plot(dpi=300)
     ax.plot(x, v)
@@ -301,8 +368,64 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N):
     plt.show()
 
 
-def plot_bands():
-    pass
+def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells):
+    """Calculate and plot eigenenergies for varying amount of wells
+
+            Parameters
+            ----------
+            v_0 : float
+                depth of potential wells in eV; inverse wells (walls) aren't supported right now
+            x_0 : float
+                point where the first well begins
+            u_0 : float
+                first boundary value
+            u_1 : float
+                second fixed point for numerov algorithm
+            L : float
+                width of the well
+            N : int
+                steps for resolution
+            x_min : float
+                start of x-axis
+            x_max : float
+                end of x-axis
+            e_min : float
+                starting point for energy search
+            e_max : float
+                ending point for energy search
+            accuracy : float
+                accuracy of search for zeros
+            max_bound : int
+                maximal amount of iterations if control doesn't get low enough
+            start : float
+                first step to calculate the new energy
+            max_wells : int
+                number of wells for which eigenenergies should be calculated
+
+            Returns
+            -------
+            eigen_correct : float list
+                list of eigenenergies in [eV]
+            x : float list
+                x-axis in nm
+            v : float list
+                1-D potential array
+            counter : int
+                returns len of v and x
+            """
+    fig, ax = plt.subplots()
+    ax.plot(dpi=300)
+    for i in range(1, max_wells+1):
+        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, i, e_min,
+                                                             e_max, accuracy, max_bound, start)
+        for j in range(len(eigen_correct)):
+            ax.hlines(y=eigen_correct[j], xmin=i-1, xmax=i, linewidth=2, color='r')
+    plt.grid(True)
+    plt.show()
+
+
+
+
 ########################################################################################################################
 #Variablen hier
 v_0 = 0.3
@@ -316,17 +439,19 @@ E = 1.
 u_0 = .0
 u_1 = .01
 max_bound = 1000000
-accuracy = 0.00001
+accuracy = 0.0001
 start = 0.01
 E_0 = -1
 E_max = 0
 e_min = -2
 e_max = 0
+max_wells = 5
 ########################################################################################################################
 #Berechnung
-eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                     accuracy, max_bound, start)
-plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N)
+#eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+#                                                    accuracy, max_bound, start)
+#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N)
+plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
 
 
 
