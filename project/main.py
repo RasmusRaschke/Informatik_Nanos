@@ -266,16 +266,6 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, st
     return eigen_corrected
 
 
-def truncate(u, factor):
-    #ask in next meeting about how this should look
-    maximum = max(u)
-    limit = maximum / factor
-    for i in range(len(u)):
-        if abs(u[i]) < limit:
-            u[i] = 0
-    return u
-
-
 def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max, accuracy, max_bound, start):
     """Calculate accurate eigenvalues with NR-algorithm
 
@@ -327,7 +317,7 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
     return eigen_correct, x, v, counter
 
 
-def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N):
+def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs=0):
     """Calculate and plot eigenstates with given eigenenergies
 
             Parameters
@@ -354,12 +344,26 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N):
             """
     fig, ax = plt.subplots()
     ax.plot(dpi=300)
-    ax.plot(x, v)
+    ax.plot(x, v, c="black")
     ax2 = ax.twinx()
-    for i in range(len(eigen_correct)):
-        K = get_k(v, eigen_correct[i])
-        wave = numerov(u_0, u_1, K, counter, x_min, x_max, N)
-        ax2.plot(x, norm(wave), label=r"$\psi_{%i}$"%(i+1))
+    if graphs == 0:
+        for i in range(len(eigen_correct)):
+            K = get_k(v, eigen_correct[i])
+            wave = numerov(u_0, u_1, K, counter, x_min, x_max)
+            wave = norm(wave)
+            for j, item in enumerate(wave):
+                wave[j] = wave[j] + eigen_correct[i]
+            ax2.plot(x, wave, label=r"$\psi_{%i}$"%(i+1))
+            ax2.axhline(eigen_correct[i], ls='--', c='red')
+    else:
+        for i in range(graphs):
+            K = get_k(v, eigen_correct[i])
+            wave = numerov(u_0, u_1, K, counter, x_min, x_max)
+            wave = norm(wave)
+            for j, item in enumerate(wave):
+                wave[j] = wave[j] + eigen_correct[i]
+            ax2.plot(x, wave, label=r"$\psi_{%i}$"%(i+1))
+            ax2.axhline(eigen_correct[i], ls='--', c='red')
     plt.grid(True)
     ax.set_xlabel(r'x in $[nm]$')
     ax2.spines['right'].set_color('red')
@@ -434,12 +438,12 @@ L = 3
 N = 1000
 x_min = 0
 x_max = 10
-wells = 50
+wells = 1
 E = 1.
 u_0 = .0
 u_1 = .01
 max_bound = 1000000
-accuracy = 0.0001
+accuracy = 0.00001
 start = 0.01
 E_0 = -1
 E_max = 0
@@ -448,10 +452,10 @@ e_max = 0
 max_wells = 5
 ########################################################################################################################
 #Berechnung
-#eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-#                                                    accuracy, max_bound, start)
-#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, N)
-plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                    accuracy, max_bound, start)
+plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
+#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
 
 
 
