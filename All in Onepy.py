@@ -223,6 +223,7 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
         """
     e = eigen_estimate
     de = differential
+    c = 0
     for i in range(max_bound):
         K = get_k(v, e)
         psi_1 = numerov(u_0, u_1, K, counter, x_min, x_max)
@@ -235,9 +236,11 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
         de = de_new
         control = e_new - e
         e = copy.copy(e_new)
+        c += 1
         if control < accuracy:
             break
     print(e_new)
+    print("Schritte:", c)
     return e_new
 
 def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_estimate):
