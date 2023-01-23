@@ -424,7 +424,7 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, m
     ax.plot(dpi=300)
     for i in range(1, max_wells+1):
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, i, e_min,
-                                                             e_max, accuracy, max_bound, start)
+                                                             e_max, accuracy, accuracy, max_bound, start)
         for j in range(len(eigen_correct)):
             ax.hlines(y=eigen_correct[j], xmin=i-1, xmax=i, linewidth=2, color='r')
     plt.grid(True)
@@ -441,26 +441,26 @@ L = 3
 N = 1000
 x_min = 0
 x_max = 10
-wells = 50
+wells = 3
 E = 1.
 u_0 = .0
 u_1 = .001
 max_bound = 1000000
-accuracy_cheap = 0.01
-accuracy_exp = 0.0000001
+accuracy_cheap = 0.001
+accuracy_exp = 0.00000000001
 accuracy_bands = 0.01
-start = 0.001
+start = 0.000000001
 E_0 = -1
 E_max = 0
 e_min = -2
 e_max = 0
-max_wells = 5
+max_wells = 100
 ########################################################################################################################
 #Berechnung
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
                                                     accuracy_cheap, accuracy_exp, max_bound, start)
-plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
-#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_bands, max_bound, start, max_wells)
+#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 3)
+plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_bands, max_bound, start, max_wells)
 
 
 

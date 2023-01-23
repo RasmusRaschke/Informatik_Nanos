@@ -677,7 +677,7 @@ frame_advance = tk.Frame(master = window,bd = 5)
 
 # create the label for the number of the pots with an entry
 
-label_töpfe = tk.Label(master = frame_töpfe, text = "Number of wells", width = 30)
+label_töpfe = tk.Label(master = frame_töpfe, text = "Topfanzahl", width = 30)
 label_töpfe.pack(side = tk.LEFT)
 
 entry_töpfe = tk.Entry(master = frame_töpfe, width = 20)
@@ -685,7 +685,7 @@ entry_töpfe.pack(side = tk.LEFT)
 
 # create the label for the wight of the pots with an entry
 
-label_breite = tk.Label(master = frame_breite, text = "Width of the wells(in nm)", width = 30)
+label_breite = tk.Label(master = frame_breite, text = "Topfbreite [nm]", width = 30)
 label_breite.pack(side = tk.LEFT)
 
 
@@ -694,7 +694,7 @@ entry_breite.pack(side = tk.LEFT)
 
 # create the label for the depth of the pots  with an entry
 
-label_tiefe = tk.Label(master = frame_tiefe, text = "Depth of the wells(in nm)", width = 30)
+label_tiefe = tk.Label(master = frame_tiefe, text = "Potentialtiefe [nm]", width = 30)
 label_tiefe.pack(side = tk.LEFT)
 
 entry_tiefe = tk.Entry(master = frame_tiefe, width = 20)
@@ -709,13 +709,13 @@ button_calc.pack(side= tk.RIGHT,)
 button_calc = ttk.Button(master = frame_knöpfe,text = "Calculate", command= cal)
 button_calc.pack(side= tk.RIGHT,)
 
-button_clear = ttk.Button(master = frame_knöpfe,text = "clear", command= clear)
+button_clear = ttk.Button(master = frame_knöpfe,text = "Clear", command= clear)
 button_clear.pack(side= tk.RIGHT,)
 
 
 #create the label for distance between the pots 
 
-label_abstand = tk.Label(master = frame_abstand, text = "Distance between the wells(in nm)", width = 30)
+label_abstand = tk.Label(master = frame_abstand, text = "Topfabstand [nm]", width = 30)
 label_abstand.pack(side = tk.LEFT)
 
 entry_abstand = tk.Entry(master = frame_abstand, width = 20)
@@ -723,7 +723,7 @@ entry_abstand.pack(side = tk.LEFT)
 
 #create the label for emin
 
-label_emin = tk.Label(master = frame_emin, text = "emin", width = 30)
+label_emin = tk.Label(master = frame_emin, text = "Start der Eigenenergiesuche [eV]", width = 30)
 label_emin.pack(side = tk.LEFT)
 
 entry_emin = tk.Entry(master = frame_emin, width = 20)
@@ -731,7 +731,7 @@ entry_emin.pack(side = tk.LEFT)
 
 # create the label for emax
 
-label_emax = tk.Label(master = frame_emax, text = "emax", width = 30)
+label_emax = tk.Label(master = frame_emax, text = "Grenze der Eigenenergiesuche [eV]", width = 30)
 label_emax.pack(side = tk.LEFT)
 
 entry_emax = tk.Entry(master = frame_emax, width = 20)
@@ -747,7 +747,7 @@ entry_E.pack(side = tk.LEFT)
 
 # create the label for accuracy
 
-label_accuracy = tk.Label(master = frame_accuracy, text = "accuracy", width = 30)
+label_accuracy = tk.Label(master = frame_accuracy, text = "Genauigkeit", width = 30)
 label_accuracy.pack(side = tk.LEFT)
 
 entry_accuracy = tk.Entry(master = frame_accuracy, width = 20)
@@ -763,7 +763,7 @@ entry_maxwells.pack(side = tk.LEFT)
 
 # create the label for xmin
 
-label_xmin = tk.Label(master = frame_xmin, text = "xmin", width = 30)
+label_xmin = tk.Label(master = frame_xmin, text = "linke x-Grenze [nm]", width = 30)
 label_xmin.pack(side = tk.LEFT)
 
 entry_xmin = tk.Entry(master = frame_xmin, width = 20)
@@ -771,14 +771,14 @@ entry_xmin.pack(side = tk.LEFT)
 
 # create the label for xmax
 
-label_xmax = tk.Label(master = frame_xmax, text = "xmax", width = 30)
+label_xmax = tk.Label(master = frame_xmax, text = "rechte x-Grenze [nm]", width = 30)
 label_xmax.pack(side = tk.LEFT)
 
 entry_xmax = tk.Entry(master = frame_xmax, width = 20)
 entry_xmax.pack(side = tk.LEFT)
 
 # create checkbox for advance GUI
-Button_advance = ttk.Button(master = frame_advance, text = "Advance Options", command = adv)                               
+Button_advance = ttk.Button(master = frame_advance, text = "Entwickleroptionen", command = adv)
 Button_advance.pack(side = tk.LEFT)
 
 #pack all the frames, buttons and labels
