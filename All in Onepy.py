@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
 import math as m
 import copy
 import tkinter as tk
@@ -12,10 +11,17 @@ from tkinter import ttk
 
 window = tk.Tk()
 
+# creat a list of created wigedts, because its easier to delete them afterwards
+
+list_of_widget = []
+
+list_of_widget2 = []
+
+# Define On as 1, because it will be used in the adv function as a turn on switch
 
 on = 1
 
-# set variables in case the User don´t use the advance Options
+
 
 def periodic(v_0, x_0, L, N, x_min, x_max, wells=1):
     """Get equally spaced potential wells of defined width and depth; calculate correspondent x-axis in nm
@@ -223,7 +229,6 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
         """
     e = eigen_estimate
     de = differential
-    c = 0
     for i in range(max_bound):
         K = get_k(v, e)
         psi_1 = numerov(u_0, u_1, K, counter, x_min, x_max)
@@ -236,11 +241,9 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
         de = de_new
         control = e_new - e
         e = copy.copy(e_new)
-        c += 1
         if control < accuracy:
             break
     print(e_new)
-    print("Schritte:", c)
     return e_new
 
 def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_estimate):
@@ -335,8 +338,8 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
 
 
 def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs=0):
+    global canvas, list_of_widget
     
-    global canvas
     
     """Calculate and plot eigenstates with given eigenenergies
 
@@ -392,12 +395,16 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
     
     # create a widget to show the plot in the GUI
     
-    canvas = FigureCanvasTkAgg(fig, window)
+    canvas = FigureCanvasTkAgg(fig, frame_Graph)
     
     canvas.get_tk_widget().pack(side = tk.RIGHT, anchor="ne")
+    
+    list_of_widget.append(canvas.get_tk_widget())
+    
     return
 
 def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells):
+    global canvas2, list_of_widget2
     """Calculate and plot eigenenergies for varying amount of wells
 
             Parameters
@@ -451,11 +458,18 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, m
             ax.hlines(y=eigen_correct[j], xmin=i-1, xmax=i, linewidth=2, color='r')
     plt.grid(True)
     plt.show()
+    
+    canvas2 = FigureCanvasTkAgg(fig, frame_Graph2)
+    
+    canvas2.get_tk_widget().pack(side = tk.RIGHT, anchor="se")
+    
+    list_of_widget2.append(canvas2.get_tk_widget())
 
 
 #Define the "cal" function to set the variables and start the caclulations
 
 def cal() : 
+    # set all variables to global so they will be used from other functions as well 
     global on, E_max,u_0,u_1,max_bound,E_0,N,start,v_0,x_0,L,x_min,x_max,wells,E,accuracy,e_min,e_max,max_wells, on 
     global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0
     if on : 
@@ -493,7 +507,7 @@ def cal() :
         
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,accuracy, max_bound, start)
         plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
-        #plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+        plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
         
         return
     else :
@@ -538,7 +552,7 @@ def cal() :
         on = 0
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,accuracy, max_bound, start)
         plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
-        #plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+        plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
         return
         
 
@@ -546,6 +560,9 @@ def cal() :
 # Define the adv funtction to show and hide advance options 
 
 def adv() : 
+    
+    # set all Variables to global so they can be used in other functions too
+    
     global on, E_max,u_0,u_1,max_bound,E_0,N,start
     global frame_Emax, frame_start, frame_N, frame_E_0, frame_u_1, frame_u_0,frame_max_bound
     global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0,entry_max_bound
@@ -634,12 +651,15 @@ def adv() :
         N=1000
 
 def clear() : 
+    global canvas, list_of_widget, canvas2, list_of_widget2
     
-    canvas.get_tk_widget().destroy()
+    for widget in list_of_widget:
+        widget.destroy()
+    for widget in list_of_widget2:
+        widget.destroy()
     return
 
 # set the size of the window 
-
 
 window.geometry("1200x700")
 
@@ -651,6 +671,7 @@ window.title("Periodische Abfolge endlicher Potentialtöpfe")
 
 frame_Graph = tk.Frame()
 
+frame_Graph2 = tk.Frame()
 
 frame_töpfe = tk.Frame(master = window, bd= 5)
 
@@ -703,7 +724,7 @@ label_tiefe.pack(side = tk.LEFT)
 entry_tiefe = tk.Entry(master = frame_tiefe, width = 20)
 entry_tiefe.pack(side = tk.LEFT)
 
-# create a button to clalculate and close the window
+# create two buttons to clalculate and close the window
 # and a button to clear the graphs 
 
 button_calc = ttk.Button(master = frame_knöpfe,text = "Exit", command= window.destroy)
@@ -780,7 +801,7 @@ label_xmax.pack(side = tk.LEFT)
 entry_xmax = tk.Entry(master = frame_xmax, width = 20)
 entry_xmax.pack(side = tk.LEFT)
 
-# create checkbox for advance GUI
+# create a button for advance GUI options
 Button_advance = ttk.Button(master = frame_advance, text = "Advance Options", command = adv)                               
 Button_advance.pack(side = tk.LEFT)
 
@@ -812,13 +833,18 @@ frame_advance.pack(anchor="nw")
 
 frame_Graph.pack(anchor="ne")
 
+frame_Graph2.pack(anchor="se")
+
 frame_knöpfe.pack(side = tk.BOTTOM, anchor="se")
 
 
-
+# start the mainloop
 
 window.mainloop()
 
+# Here are all the variables in case they will be needed in the future 
+
+"""
 var_v_0 = entry_tiefe.get()
 var_x_0 = entry_abstand.get()
 var_L = entry_breite.get()
@@ -858,9 +884,9 @@ e_min = int(var_e_min)
 e_max = int(var_e_max)
 max_wells = int(var_max_wells)
 
-# start the mainloop
 
 
+"""
 
 
 
