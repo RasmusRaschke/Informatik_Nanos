@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import math as m
 plt.rc('legend', fontsize=8)
 ########################################################################################################################
-def periodic(v_0, x_0, L, N, x_min, x_max, wells=1):
+def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1):
     """Get equally spaced potential wells of defined width and depth; calculate correspondent x-axis in nm
 
     Parameters
@@ -41,18 +41,32 @@ def periodic(v_0, x_0, L, N, x_min, x_max, wells=1):
     spacing_steps = m.ceil((x_0 - x_min) / h)
     well_steps = m.ceil(L / h)
     counter = 0
-    for i in range(wells):
-        for j in range(spacing_steps):
+    if electric == 1:
+        for i in range(wells):
+            for j in range(spacing_steps):
+                v.append(0)
+                counter += 1
+            for k in range(well_steps):
+                v.append(- v_0)
+                counter += 1
+        for i in range(spacing_steps):
             v.append(0)
             counter += 1
-        for k in range(well_steps):
-            v.append(- v_0)
+        for i in range(counter):
+            x.append(i * h)
+    else:
+        for i in range(wells):
+            for j in range(spacing_steps):
+                v.append(charge * el_field * j)
+                counter += 1
+            for k in range(well_steps):
+                v.append(- v_0 + charge * el_field * k)
+                counter += 1
+        for i in range(spacing_steps):
+            v.append(charge * el_field * i)
             counter += 1
-    for i in range(spacing_steps):
-        v.append(0)
-        counter += 1
-    for i in range(counter):
-        x.append(i * h)
+        for i in range(counter):
+            x.append(i * h)
     return x, v, counter
 
 def get_k(v, E):
@@ -269,7 +283,7 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, st
 
 
 def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max, accuracy_cheap, accuracy_exp,
-                          max_bound, start):
+                          max_bound, start, charge, el_field, electric=1):
     """Calculate accurate eigenvalues with NR-algorithm
 
         Parameters
@@ -314,7 +328,7 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
         counter : int
             returns len of v and x
         """
-    x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, wells)
+    x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells, electric)
     eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy_cheap)
     eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy_exp, start, eigen_simple)
     return eigen_correct, x, v, counter
@@ -380,7 +394,8 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filen
     plt.show()
 
 
-def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start, max_wells, filename):
+def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound,
+               start, max_wells, charge, el_field, electric, filename):
     """Calculate and plot eigenenergies for varying amount of wells
 
             Parameters
@@ -428,52 +443,72 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
     fig, ax = plt.subplots()
     ax.plot(dpi=1200)
     for i in range(1, max_wells+1):
-        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, i, e_min,
-                                                             e_max, accuracy_cheap, accuracy_exp, max_bound, start)
+        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, i, e_min, e_max,
+                                                    accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
+                                                     electric)
         for j in range(len(eigen_correct)):
             ax.hlines(y=eigen_correct[j], xmin=i-1, xmax=i, linewidth=2, color='r')
     plt.grid(True)
-    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.svg'%filename, dpi=1200)
+    ax.set_xlabel(r'Kastenanzahl')
+    ax.set_ylabel(r'Eigenenergien in $[eV]$')
+    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000)
     plt.show()
 
 
 ########################################################################################################################
 #Variablen hier
-v_0 = 0.5
-x_0 = 2
-L = 3
-N = 1000
-x_min = 0
-x_max = 10
-wells = 1
-E = 1.
-u_0 = .0
-u_1 = .001
-max_bound = 1000000
-accuracy_cheap = 0.00001
-accuracy_exp = 0.00000000001
-start = 0.000000001
-E_0 = -1
-E_max = 0
-e_min = -2
-e_max = 0
-max_wells = 50
-filename = 'one_well_leg'
-legend = 0
+v_0 = 3.0 #Kastentiefe in [eV]
+x_0 = 2 #Startpunkt des ersten Kastens in [nm]
+L = 3 #Kastenbreite in [nm]
+wells = 1 #Kastenanzahl
+accuracy_cheap = 0.001 #Genauigkeit
+e_min = -3 #untere Grenze der Eigenwertsuche
+e_max = 0 #obere Grenze der Eigenwertsuche
+max_wells = 50 #Kastenanzahl für Bandberechnung
+filename = 'test' #NICHT IN GUI
+legend = 0 #NICHT IN GUI
+charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
+el_field = 0.001 #Elektrisches Feld in [eV^2]
+electric = 1 #DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
+E = 1. #ENTWICKLEROPTION; Energie der k-List in [eV]
+u_0 = .0 #ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
+u_1 = .001 #ENTWICKLEROPTION; 2. Randbedingung des Numerov-Verfahrens
+max_bound = 1000000 #ENTWICKLEROPTION; maximale Iterationen des NR-Verfahrens
+accuracy_exp = 0.00000001 #ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
+start = 0.000000001 #ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
+N = 1000 #ENTWICKLEROPTION #Auflösung des Potentials
+x_min = 0 #ENTWICKLEROPTION; Beginn des Plots
+x_max = 10 #ENTWICKLEROPTION; Ende des Plots
 ########################################################################################################################
-#Berechnung
+#Berechnung #SO FUNKTIONIERT DAS PROGRAMM MIT DEN AKTUELLEN VARIABLEN
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                    accuracy_cheap, accuracy_exp, max_bound, start)
+                                                    accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
+                                                     electric)
 plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
-#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start, max_wells, filename, legend)
+#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
+           #max_wells, charge, el_field, electric, filename)
 
-def vary_width(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                         accuracy_cheap, accuracy_exp, max_bound, start):
-    eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                         accuracy_cheap, accuracy_exp, max_bound, start)
-    plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
-
-
-
-
-
+########################################################################################################################
+#EINFACH IGNORIEREN
+'''
+average_x = [1, 1.5, 2, 2.5, 3, 5, 10]
+plot_average_1 = [-0.2559052422454842, -0.34271239128133507, -0.38613615166845133, -0.4105402983419828, 
+-0.4257988851412097, -0.45321103550772684, -0.47045380448876606]
+plot_average_2 = [-0.29137048925821984, -0.3546134550060287, -0.38809011653195064, -0.40789164055927113, 
+-0.4207453397473255, -0.4450937912244151, -0.4617850941578363]
+plot_average_3 = [-0.17527399182584188, -0.22804813899323487, -0.26463821991839376, -0.29132183753909535, 
+-0.3116466744996986, -0.36061326839469215, -0.4090776227071717]
+plt.scatter(average_x, plot_average_1)
+plt.scatter(average_x, plot_average_2)
+plt.scatter(average_x, plot_average_3)
+plt.plot(average_x, plot_average_1, label="Ein Kasten")
+plt.plot(average_x, plot_average_2, label="Zwei Kästen")
+plt.plot(average_x, plot_average_3, label="Zehn Kästen")
+plt.legend(loc='upper right')
+plt.grid(True)
+plt.xlabel(r"Topfabstand in $[nm]$")
+plt.ylabel(r'Mittel der ersten drei Eigenenergien in $[eV]$')
+plt.savefig('/home/rasmus/Informatik_Nanos/plots/width_averages.png', dpi=1200)
+plt.show()
+'''
+########################################################################################################################
