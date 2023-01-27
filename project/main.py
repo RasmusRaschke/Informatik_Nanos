@@ -1,8 +1,22 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 import math as m
 import copy
+import tkinter as tk
+from tkinter import ttk
 ########################################################################################################################
+
+# create a window that will be needed to show the results and change the variables
+
+window = tk.Tk()
+
+
+on = 1
+
+# set variables in case the User don´t use the advance Options
+
 def periodic(v_0, x_0, L, N, x_min, x_max, wells=1):
     """Get equally spaced potential wells of defined width and depth; calculate correspondent x-axis in nm
 
@@ -318,6 +332,9 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
 
 
 def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs=0):
+    
+    global canvas
+    
     """Calculate and plot eigenstates with given eigenenergies
 
             Parameters
@@ -369,8 +386,13 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
     ax2.spines['right'].set_color('red')
     ax2.tick_params(axis='y', colors='red')
     plt.legend()
-    plt.show()
-
+    
+    # create a widget to show the plot in the GUI
+    
+    canvas = FigureCanvasTkAgg(fig, window)
+    
+    canvas.get_tk_widget().pack(side = tk.RIGHT, anchor="ne")
+    return
 
 def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells):
     """Calculate and plot eigenenergies for varying amount of wells
@@ -428,34 +450,415 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, m
     plt.show()
 
 
+#Define the "cal" function to set the variables and start the caclulations
+
+def cal() : 
+    global on, E_max,u_0,u_1,max_bound,E_0,N,start,v_0,x_0,L,x_min,x_max,wells,E,accuracy,e_min,e_max,max_wells, on 
+    global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0
+    if on : 
+        var_v_0 = entry_tiefe.get()
+        var_x_0 = entry_abstand.get()
+        var_L = entry_breite.get()
+        var_x_min = entry_xmin.get()
+        var_x_max = entry_xmax.get()
+        var_wells = entry_töpfe.get()
+        var_accuracy = entry_accuracy.get()
+        var_e_min = entry_emin.get()
+        var_e_max = entry_emax.get()
+        var_max_wells = entry_maxwells.get()
+        
+        u_1 = .01
+        u_0 = .0
+        E_max = 0
+        on = 1
+        E_0 = -1
+        max_bound = 1000000
+        start = 0.01
+        N=1000
+        
+        
+        v_0 = float(var_v_0)
+        x_0 = float(var_x_0)
+        L = float(var_L)
+        x_min =float(var_x_min)
+        x_max = float(var_x_max)
+        wells = int(var_wells)
+        accuracy = float(var_accuracy)
+        e_min = float(var_e_min)
+        e_max = float(var_e_max)
+        max_wells = int(var_max_wells)
+        
+        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,accuracy, max_bound, start)
+        plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
+        #plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+        
+        return
+    else :
+        var_v_0 = entry_tiefe.get()
+        var_x_0 = entry_abstand.get()
+        var_L = entry_breite.get()
+        var_N = entry_N.get()
+        var_x_min = entry_xmin.get()
+        var_x_max = entry_xmax.get()
+        var_wells = entry_töpfe.get()
+        var_E = entry_E.get()
+        var_u_0 = entry_u_0.get()
+        var_u_1 = entry_u_1.get()
+        var_max_bound = entry_max_bound.get()
+        var_accuracy = entry_accuracy.get()
+        var_start = entry_start.get()
+        var_E_0 = entry_E_0.get()
+        var_E_max = entry_Emax.get()
+        var_e_min = entry_emin.get()
+        var_e_max = entry_emax.get()
+        var_max_wells = entry_maxwells.get()
+    
+    
+        v_0 = float(var_v_0)
+        x_0 = float(var_x_0)
+        L = float(var_L)
+        N = float(var_N)
+        x_min =float(var_x_min)
+        x_max = float(var_x_max)
+        wells = int(var_wells)
+        E = float(var_E)
+        u_0 = float(var_u_0)
+        u_1 = float(var_u_1)
+        max_bound = int(var_max_bound)
+        accuracy = float(var_accuracy)
+        start = float(var_start)
+        E_0 = float(var_E_0)
+        E_max = float(var_E_max)
+        e_min = float(var_e_min)
+        e_max = float(var_e_max)
+        max_wells = int(var_max_wells)
+        on = 0
+        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,accuracy, max_bound, start)
+        plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
+        #plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+        return
+        
+
+    
+# Define the adv funtction to show and hide advance options 
+
+def adv() : 
+    global on, E_max,u_0,u_1,max_bound,E_0,N,start
+    global frame_Emax, frame_start, frame_N, frame_E_0, frame_u_1, frame_u_0,frame_max_bound
+    global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0,entry_max_bound
+    
+    
+    if on :
+        
+        frame_start = tk.Frame(master = window,bd = 5)
+        label_start = tk.Label(master = frame_start, text = "start(Default is 0.01", width = 30)
+        label_start.pack(side = tk.LEFT)
+
+        entry_start = tk.Entry(master = frame_start, width = 20)
+        entry_start.pack(side = tk.LEFT)
+    
+        frame_start.pack(anchor="nw")
+        
+        frame_Emax = tk.Frame(master = window,bd = 5)
+        label_Emax = tk.Label(master = frame_Emax, text = "Emax(Default is 0)", width = 30)
+        label_Emax.pack(side = tk.LEFT)
+
+        entry_Emax = tk.Entry(master = frame_Emax, width = 20)
+        entry_Emax.pack(side = tk.LEFT)
+    
+        frame_Emax.pack(anchor="nw")
+        
+        frame_E_0 = tk.Frame(master = window,bd = 5)
+        label_E_0 = tk.Label(master = frame_E_0, text = "E_0(Default is -1)", width = 30)
+        label_E_0.pack(side = tk.LEFT)
+
+        entry_E_0 = tk.Entry(master = frame_E_0, width = 20)
+        entry_E_0.pack(side = tk.LEFT)
+    
+        frame_E_0.pack(anchor="nw")
+        
+        frame_N = tk.Frame(master = window,bd = 5)
+        label_N = tk.Label(master = frame_N, text = "N(Default is 1000 )", width = 30)
+        label_N.pack(side = tk.LEFT)
+
+        entry_N = tk.Entry(master = frame_N, width = 20)
+        entry_N.pack(side = tk.LEFT)
+    
+        frame_N.pack(anchor="nw")
+        
+        frame_max_bound = tk.Frame(master = window,bd = 5)
+        label_max_bound = tk.Label(master = frame_max_bound, text = "max_bound(Default is 1000000 )", width = 30)
+        label_max_bound.pack(side = tk.LEFT)
+
+        entry_max_bound = tk.Entry(master = frame_max_bound, width = 20)
+        entry_max_bound.pack(side = tk.LEFT)
+    
+        frame_max_bound.pack(anchor="nw")
+        
+        frame_u_0 = tk.Frame(master = window,bd = 5)
+        label_u_0 = tk.Label(master = frame_u_0, text = "u_0(Default is .0", width = 30)
+        label_u_0.pack(side = tk.LEFT)
+
+        entry_u_0 = tk.Entry(master = frame_u_0, width = 20)
+        entry_u_0.pack(side = tk.LEFT)
+    
+        frame_u_0.pack(anchor="nw")
+        
+        frame_u_1 = tk.Frame(master = window,bd = 5)
+        label_u_1 = tk.Label(master = frame_u_1, text = "u_1(Defualt is .01", width = 30)
+        label_u_1.pack(side = tk.LEFT)
+
+        entry_u_1 = tk.Entry(master = frame_u_1, width = 20)
+        entry_u_1.pack(side = tk.LEFT)
+    
+        frame_u_1.pack(anchor="nw")
+        on = 0
+    else :
+        frame_E_0.destroy()
+        frame_N.destroy()
+        frame_u_1.destroy()
+        frame_Emax.destroy()
+        frame_u_0.destroy()
+        frame_start.destroy()
+        frame_max_bound.destroy()
+        u_1 = .01
+        u_0 = .0
+        E_max = 0
+        on = 1
+        E_0 = -1
+        max_bound = 1000000
+        start = 0.01
+        N=1000
+
+def clear() : 
+    
+    canvas.get_tk_widget().destroy()
+    return
+
+# set the size of the window 
 
 
-########################################################################################################################
-#Variablen hier
-v_0 = 0.3
-x_0 = 2
-L = 3
-N = 1000
-x_min = 0
-x_max = 10
-wells = 1
-E = 1.
-u_0 = .0
-u_1 = .01
-max_bound = 1000000
-accuracy = 0.00001
-start = 0.01
-E_0 = -1
-E_max = 0
-e_min = -2
-e_max = 0
-max_wells = 5
-########################################################################################################################
-#Berechnung
-eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                    accuracy, max_bound, start)
-plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
-#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells)
+window.geometry("1200x700")
+
+#create Title of the window
+
+window.title("Periodische Abfolge endlicher Potentialtöpfe")
+
+# create frames for each variable in the project
+
+frame_Graph = tk.Frame()
+
+
+frame_töpfe = tk.Frame(master = window, bd= 5)
+
+frame_tiefe = tk.Frame(master = window, bd = 5)
+
+frame_breite = tk.Frame(master = window,bd = 5)
+
+frame_abstand = tk.Frame(master = window,bd = 5)
+
+frame_knöpfe = tk.Frame(master = window,bd = 10)
+
+frame_emin = tk.Frame(master = window,bd = 5)
+
+frame_emax = tk.Frame(master = window,bd = 5)
+
+frame_xmin = tk.Frame(master = window,bd = 5)
+
+frame_xmax = tk.Frame(master = window,bd = 5)
+
+frame_E = tk.Frame(master = window,bd = 5)
+
+frame_maxwells = tk.Frame(master = window,bd = 5)
+
+frame_accuracy = tk.Frame(master = window,bd = 5)
+
+frame_advance = tk.Frame(master = window,bd = 5)
+
+# create the label for the number of the pots with an entry
+
+label_töpfe = tk.Label(master = frame_töpfe, text = "Topfanzahl", width = 30)
+label_töpfe.pack(side = tk.LEFT)
+
+entry_töpfe = tk.Entry(master = frame_töpfe, width = 20)
+entry_töpfe.pack(side = tk.LEFT)
+
+# create the label for the wight of the pots with an entry
+
+label_breite = tk.Label(master = frame_breite, text = "Topfbreite [nm]", width = 30)
+label_breite.pack(side = tk.LEFT)
+
+
+entry_breite = tk.Entry(master = frame_breite, width = 20)
+entry_breite.pack(side = tk.LEFT)
+
+# create the label for the depth of the pots  with an entry
+
+label_tiefe = tk.Label(master = frame_tiefe, text = "Potentialtiefe [nm]", width = 30)
+label_tiefe.pack(side = tk.LEFT)
+
+entry_tiefe = tk.Entry(master = frame_tiefe, width = 20)
+entry_tiefe.pack(side = tk.LEFT)
+
+# create a button to clalculate and close the window
+# and a button to clear the graphs 
+
+button_calc = ttk.Button(master = frame_knöpfe,text = "Exit", command= window.destroy)
+button_calc.pack(side= tk.RIGHT,)
+
+button_calc = ttk.Button(master = frame_knöpfe,text = "Calculate", command= cal)
+button_calc.pack(side= tk.RIGHT,)
+
+button_clear = ttk.Button(master = frame_knöpfe,text = "Clear", command= clear)
+button_clear.pack(side= tk.RIGHT,)
+
+
+#create the label for distance between the pots 
+
+label_abstand = tk.Label(master = frame_abstand, text = "Topfabstand [nm]", width = 30)
+label_abstand.pack(side = tk.LEFT)
+
+entry_abstand = tk.Entry(master = frame_abstand, width = 20)
+entry_abstand.pack(side = tk.LEFT)
+
+#create the label for emin
+
+label_emin = tk.Label(master = frame_emin, text = "Start der Eigenenergiesuche [eV]", width = 30)
+label_emin.pack(side = tk.LEFT)
+
+entry_emin = tk.Entry(master = frame_emin, width = 20)
+entry_emin.pack(side = tk.LEFT)
+
+# create the label for emax
+
+label_emax = tk.Label(master = frame_emax, text = "Grenze der Eigenenergiesuche [eV]", width = 30)
+label_emax.pack(side = tk.LEFT)
+
+entry_emax = tk.Entry(master = frame_emax, width = 20)
+entry_emax.pack(side = tk.LEFT)
+
+# create the label for E
+
+label_E = tk.Label(master = frame_E, text = "E", width = 30)
+label_E.pack(side = tk.LEFT)
+
+entry_E = tk.Entry(master = frame_E, width = 20)
+entry_E.pack(side = tk.LEFT)
+
+# create the label for accuracy
+
+label_accuracy = tk.Label(master = frame_accuracy, text = "Genauigkeit", width = 30)
+label_accuracy.pack(side = tk.LEFT)
+
+entry_accuracy = tk.Entry(master = frame_accuracy, width = 20)
+entry_accuracy.pack(side = tk.LEFT)
+
+# create the label for maxwells
+
+label_maxwells = tk.Label(master = frame_maxwells, text = "max wells", width = 30)
+label_maxwells.pack(side = tk.LEFT)
+
+entry_maxwells = tk.Entry(master = frame_maxwells, width = 20)
+entry_maxwells.pack(side = tk.LEFT)
+
+# create the label for xmin
+
+label_xmin = tk.Label(master = frame_xmin, text = "linke x-Grenze [nm]", width = 30)
+label_xmin.pack(side = tk.LEFT)
+
+entry_xmin = tk.Entry(master = frame_xmin, width = 20)
+entry_xmin.pack(side = tk.LEFT)
+
+# create the label for xmax
+
+label_xmax = tk.Label(master = frame_xmax, text = "rechte x-Grenze [nm]", width = 30)
+label_xmax.pack(side = tk.LEFT)
+
+entry_xmax = tk.Entry(master = frame_xmax, width = 20)
+entry_xmax.pack(side = tk.LEFT)
+
+# create checkbox for advance GUI
+Button_advance = ttk.Button(master = frame_advance, text = "Entwickleroptionen", command = adv)
+Button_advance.pack(side = tk.LEFT)
+
+#pack all the frames, buttons and labels
+
+frame_töpfe.pack( anchor="nw" )
+
+frame_tiefe.pack(anchor="nw") 
+
+frame_breite.pack(anchor="nw")
+
+frame_abstand.pack(anchor="nw")
+
+frame_accuracy.pack(anchor="nw")
+
+frame_emin.pack(anchor="nw")
+
+frame_emax.pack(anchor="nw")
+
+frame_xmin.pack(anchor="nw")
+
+frame_xmax.pack(anchor="nw")
+
+frame_E.pack(anchor="nw")
+
+frame_maxwells.pack(anchor="nw")
+
+frame_advance.pack(anchor="nw")
+
+frame_Graph.pack(anchor="ne")
+
+frame_knöpfe.pack(side = tk.BOTTOM, anchor="se")
+
+
+
+
+window.mainloop()
+
+var_v_0 = entry_tiefe.get()
+var_x_0 = entry_abstand.get()
+var_L = entry_breite.get()
+var_N = entry_N.get()
+var_x_min = entry_xmin.get()
+var_x_max = entry_xmax.get()
+var_wells = entry_töpfe.get()
+var_E = entry_E.get()
+var_u_0 = entry_u_0.get()
+var_u_1 = entry_u_1.get()
+var_max_bound = entry_max_bound.get()
+var_accuracy = entry_accuracy.get()
+var_start = entry_start.get()
+var_E_0 = entry_E_0.get()
+var_E_max = entry_Emax.get()
+var_e_min = entry_emin.get()
+var_e_max = entry_emax.get()
+var_max_wells = entry_maxwells.get()
+
+
+v_0 = int(var_v_0)
+x_0 = int(var_x_0)
+L = int(var_L)
+N = float(var_N)
+x_min =int(var_x_min)
+x_max = int(var_x_max)
+wells = int(var_wells)
+E = int(var_E)
+u_0 = int(var_u_0)
+u_1 = int(var_u_1)
+max_bound = int(var_max_bound)
+accuracy = int(var_accuracy)
+start = int(var_start)
+E_0 = int(var_E_0)
+E_max = int(var_E_max)
+e_min = int(var_e_min)
+e_max = int(var_e_max)
+max_wells = int(var_max_wells)
+
+# start the mainloop
+
+
+
 
 
 
