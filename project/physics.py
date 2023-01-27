@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math as m
-import copy
+plt.rc('legend', fontsize=8)
 ########################################################################################################################
 def periodic(v_0, x_0, L, N, x_min, x_max, wells=1):
     """Get equally spaced potential wells of defined width and depth; calculate correspondent x-axis in nm
@@ -320,7 +320,7 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
     return eigen_correct, x, v, counter
 
 
-def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs=0):
+def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend=0, graphs=0):
     """Calculate and plot eigenstates with given eigenenergies
 
             Parameters
@@ -346,7 +346,7 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
             -------
             """
     fig, ax = plt.subplots()
-    ax.plot(dpi=300)
+    ax.plot(dpi=1000)
     ax.plot(x, v, c="black")
     ax2 = ax.twinx()
     if graphs == 0:
@@ -356,7 +356,7 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
             wave = norm(wave)
             for j, item in enumerate(wave):
                 wave[j] = wave[j] + eigen_correct[i]
-            ax2.plot(x, wave, label=r"$\psi_{%i}$"%(i+1))
+            ax2.plot(x, wave, label=r"$\varepsilon_{%i} = %f $ eV"%(i+1, eigen_correct[i]))
             ax2.axhline(eigen_correct[i], ls='--', c='red')
     else:
         for i in range(graphs):
@@ -365,17 +365,22 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
             wave = norm(wave)
             for j, item in enumerate(wave):
                 wave[j] = wave[j] + eigen_correct[i]
-            ax2.plot(x, wave, label=r"$\psi_{%i}$"%(i+1))
+            ax2.plot(x, wave, label=r"$\varepsilon_{%i} = %f $ eV"%(i+1, eigen_correct[i]))
             ax2.axhline(eigen_correct[i], ls='--', c='red')
     plt.grid(True)
-    ax.set_xlabel(r'x in $[nm]$')
+    ax.set_xlabel(r'$x$ in $[nm]$')
+    ax.set_ylabel(r'$v$ in $[eV]$')
+    ax2.set_ylabel(r'$\Psi$', c='red')
     ax2.spines['right'].set_color('red')
     ax2.tick_params(axis='y', colors='red')
-    plt.legend()
+    plt.legend(loc='upper left')
+    if legend == 1:
+        plt.legend('', frameon=False)
+    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000)
     plt.show()
 
 
-def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, max_bound, start, max_wells):
+def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start, max_wells, filename):
     """Calculate and plot eigenenergies for varying amount of wells
 
             Parameters
@@ -400,7 +405,7 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, m
                 starting point for energy search
             e_max : float
                 ending point for energy search
-            accuracy : float
+            accuracy_cheap : float
                 accuracy of search for zeros
             max_bound : int
                 maximal amount of iterations if control doesn't get low enough
@@ -421,16 +426,15 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy, m
                 returns len of v and x
             """
     fig, ax = plt.subplots()
-    ax.plot(dpi=300)
+    ax.plot(dpi=1200)
     for i in range(1, max_wells+1):
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, i, e_min,
-                                                             e_max, accuracy, accuracy, max_bound, start)
+                                                             e_max, accuracy_cheap, accuracy_exp, max_bound, start)
         for j in range(len(eigen_correct)):
             ax.hlines(y=eigen_correct[j], xmin=i-1, xmax=i, linewidth=2, color='r')
     plt.grid(True)
+    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.svg'%filename, dpi=1200)
     plt.show()
-
-
 
 
 ########################################################################################################################
@@ -441,26 +445,34 @@ L = 3
 N = 1000
 x_min = 0
 x_max = 10
-wells = 3
+wells = 1
 E = 1.
 u_0 = .0
 u_1 = .001
 max_bound = 1000000
-accuracy_cheap = 0.001
+accuracy_cheap = 0.00001
 accuracy_exp = 0.00000000001
-accuracy_bands = 0.01
 start = 0.000000001
 E_0 = -1
 E_max = 0
 e_min = -2
 e_max = 0
-max_wells = 100
+max_wells = 50
+filename = 'one_well_leg'
+legend = 0
 ########################################################################################################################
 #Berechnung
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
                                                     accuracy_cheap, accuracy_exp, max_bound, start)
-#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 3)
-plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_bands, max_bound, start, max_wells)
+plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
+#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start, max_wells, filename, legend)
+
+def vary_width(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                         accuracy_cheap, accuracy_exp, max_bound, start):
+    eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                         accuracy_cheap, accuracy_exp, max_bound, start)
+    plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
+
 
 
 
