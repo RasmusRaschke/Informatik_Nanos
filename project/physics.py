@@ -457,18 +457,18 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
 
 ########################################################################################################################
 #Variablen hier
-v_0 = 3.0 #Kastentiefe in [eV]
+v_0 = 8 #Kastentiefe in [eV]
 x_0 = 2 #Startpunkt des ersten Kastens in [nm]
-L = 3 #Kastenbreite in [nm]
-wells = 1 #Kastenanzahl
-accuracy_cheap = 0.001 #Genauigkeit
-e_min = -3 #untere Grenze der Eigenwertsuche
-e_max = 0 #obere Grenze der Eigenwertsuche
-max_wells = 50 #Kastenanzahl für Bandberechnung
+L = 0.287 #Kastenbreite in [nm]
+wells = 10 #Kastenanzahl
+accuracy_cheap = 0.0001 #Genauigkeit
+e_min = -4 #untere Grenze der Eigenwertsuche
+e_max = 1 #obere Grenze der Eigenwertsuche
+max_wells = 10 #Kastenanzahl für Bandberechnung
 filename = 'test' #NICHT IN GUI
 legend = 0 #NICHT IN GUI
 charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
-el_field = 0.001 #Elektrisches Feld in [eV^2]
+el_field = 0.01 #Elektrisches Feld in [eV^2]
 electric = 1 #DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
 E = 1. #ENTWICKLEROPTION; Energie der k-List in [eV]
 u_0 = .0 #ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
