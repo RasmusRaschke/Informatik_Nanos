@@ -459,16 +459,16 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
 #Variablen hier
 v_0 = 8 #Kastentiefe in [eV]
 x_0 = 2 #Startpunkt des ersten Kastens in [nm]
-L = 0.287 #Kastenbreite in [nm]
-wells = 10 #Kastenanzahl
-accuracy_cheap = 0.0001 #Genauigkeit
-e_min = -4 #untere Grenze der Eigenwertsuche
-e_max = 1 #obere Grenze der Eigenwertsuche
-max_wells = 10 #Kastenanzahl für Bandberechnung
+L = 0.287 #Kastenbreite in [nm]; Silber: 0.287
+wells = 2 #Kastenanzahl
+accuracy_cheap = 0.01 #Genauigkeit
+e_min = -8 #untere Grenze der Eigenwertsuche
+e_max = 15 #obere Grenze der Eigenwertsuche
+max_wells = 200 #Kastenanzahl für Bandberechnung
 filename = 'test' #NICHT IN GUI
 legend = 0 #NICHT IN GUI
 charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
-el_field = 0.01 #Elektrisches Feld in [eV^2]
+el_field = 0.05 #Elektrisches Feld in [eV^2]
 electric = 1 #DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
 E = 1. #ENTWICKLEROPTION; Energie der k-List in [eV]
 u_0 = .0 #ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
@@ -483,10 +483,11 @@ x_max = 10 #ENTWICKLEROPTION; Ende des Plots
 #Berechnung #SO FUNKTIONIERT DAS PROGRAMM MIT DEN AKTUELLEN VARIABLEN
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
                                                     accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
-                                                     electric)
-plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
-#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
-           #max_wells, charge, el_field, electric, filename)
+                                                    electric)
+#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
+
+plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
+           max_wells, charge, el_field, electric, filename)
 
 ########################################################################################################################
 #EINFACH IGNORIEREN
@@ -509,6 +510,125 @@ plt.grid(True)
 plt.xlabel(r"Topfabstand in $[nm]$")
 plt.ylabel(r'Mittel der ersten drei Eigenenergien in $[eV]$')
 plt.savefig('/home/rasmus/Informatik_Nanos/plots/width_averages.png', dpi=1200)
+plt.show()
+'''
+
+'''
+fign, axn = plt.subplots()
+axn.plot(dpi=1200)
+plt.grid(True)
+axn.set_xlabel(r'elektrische Feldstärke in $[eV^2]$')
+axn.set_ylabel(r'Eigenenergien in $[eV]$')
+average1 = []
+average2 = []
+average3 = []
+field = [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+for j in field:
+    v_0 = 5  # Kastentiefe in [eV]
+    x_0 = 2  # Startpunkt des ersten Kastens in [nm]
+    L = 0.287  # Kastenbreite in [nm]
+    wells = 1  # Kastenanzahl
+    accuracy_cheap = 0.001  # Genauigkeit
+    e_min = -5  # untere Grenze der Eigenwertsuche
+    e_max = 0  # obere Grenze der Eigenwertsuche
+    max_wells = 10  # Kastenanzahl für Bandberechnung
+    filename = 'electric_field_%f'%j  # NICHT IN GUI
+    legend = 0  # NICHT IN GUI
+    charge = 0.30282212  # Ladung des Teilchens [einheitenlos]
+    el_field = j  # Elektrisches Feld in [eV^2]
+    electric = 0  # DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
+    E = 1.  # ENTWICKLEROPTION; Energie der k-List in [eV]
+    u_0 = .0  # ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
+    u_1 = .001  # ENTWICKLEROPTION; 2. Randbedingung des Numerov-Verfahrens
+    max_bound = 1000000  # ENTWICKLEROPTION; maximale Iterationen des NR-Verfahrens
+    accuracy_exp = 0.00000001  # ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
+    start = 0.000000001  # ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
+    N = 1000  # ENTWICKLEROPTION #Auflösung des Potentials
+    x_min = 0  # ENTWICKLEROPTION; Beginn des Plots
+    x_max = 10  # ENTWICKLEROPTION; Ende des Plots
+    eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                         accuracy_cheap, accuracy_exp, max_bound, start, charge,
+                                                         el_field,
+                                                         electric)
+    average = 0
+    for k in range(2):
+        average += eigen_correct[k]
+    average = average / 2
+    average1.append(average)
+
+for j in field:
+    v_0 = 5  # Kastentiefe in [eV]
+    x_0 = 2  # Startpunkt des ersten Kastens in [nm]
+    L = 0.287  # Kastenbreite in [nm]
+    wells = 3  # Kastenanzahl
+    accuracy_cheap = 0.001  # Genauigkeit
+    e_min = -5  # untere Grenze der Eigenwertsuche
+    e_max = 0  # obere Grenze der Eigenwertsuche
+    max_wells = 10  # Kastenanzahl für Bandberechnung
+    filename = 'electric_field_%f'%j  # NICHT IN GUI
+    legend = 0  # NICHT IN GUI
+    charge = 0.30282212  # Ladung des Teilchens [einheitenlos]
+    el_field = j  # Elektrisches Feld in [eV^2]
+    electric = 0  # DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
+    E = 1.  # ENTWICKLEROPTION; Energie der k-List in [eV]
+    u_0 = .0  # ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
+    u_1 = .001  # ENTWICKLEROPTION; 2. Randbedingung des Numerov-Verfahrens
+    max_bound = 1000000  # ENTWICKLEROPTION; maximale Iterationen des NR-Verfahrens
+    accuracy_exp = 0.00000001  # ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
+    start = 0.000000001  # ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
+    N = 1000  # ENTWICKLEROPTION #Auflösung des Potentials
+    x_min = 0  # ENTWICKLEROPTION; Beginn des Plots
+    x_max = 10  # ENTWICKLEROPTION; Ende des Plots
+    eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                         accuracy_cheap, accuracy_exp, max_bound, start, charge,
+                                                         el_field,
+                                                         electric)
+    average = 0
+    for k in range(2):
+        average += eigen_correct[k]
+    average = average / 2
+    average2.append(average)
+
+for j in field:
+    v_0 = 5  # Kastentiefe in [eV]
+    x_0 = 2  # Startpunkt des ersten Kastens in [nm]
+    L = 0.287  # Kastenbreite in [nm]
+    wells = 10  # Kastenanzahl
+    accuracy_cheap = 0.001  # Genauigkeit
+    e_min = -5  # untere Grenze der Eigenwertsuche
+    e_max = 0  # obere Grenze der Eigenwertsuche
+    max_wells = 10  # Kastenanzahl für Bandberechnung
+    filename = 'electric_field_%f'%j  # NICHT IN GUI
+    legend = 0  # NICHT IN GUI
+    charge = 0.30282212  # Ladung des Teilchens [einheitenlos]
+    el_field = j  # Elektrisches Feld in [eV^2]
+    electric = 0  # DAS SOLL EIN WAHLFELD WERDEN, ALSO ELEKTISCHES FELD JA/NEIN ANKREUZEN
+    E = 1.  # ENTWICKLEROPTION; Energie der k-List in [eV]
+    u_0 = .0  # ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
+    u_1 = .001  # ENTWICKLEROPTION; 2. Randbedingung des Numerov-Verfahrens
+    max_bound = 1000000  # ENTWICKLEROPTION; maximale Iterationen des NR-Verfahrens
+    accuracy_exp = 0.00000001  # ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
+    start = 0.000000001  # ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
+    N = 1000  # ENTWICKLEROPTION #Auflösung des Potentials
+    x_min = 0  # ENTWICKLEROPTION; Beginn des Plots
+    x_max = 10  # ENTWICKLEROPTION; Ende des Plots
+    eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
+                                                         accuracy_cheap, accuracy_exp, max_bound, start, charge,
+                                                         el_field,
+                                                         electric)
+    average = 0
+    for k in range(2):
+        average += eigen_correct[k]
+    average = average / 2
+    average3.append(average)
+axn.scatter(field, average1, color='black')
+axn.plot(field, average1, label='ein Kasten', color='black')
+axn.scatter(field, average2, color='red')
+axn.plot(field, average2, label='drei Kästen', color='red')
+axn.scatter(field, average3, color='blue')
+axn.plot(field, average3, label='zehn Kästen', color='blue')
+plt.legend(loc='upper left')
+plt.savefig('/home/rasmus/Informatik_Nanos/plots/electric_field_strength.png', dpi=1000)
 plt.show()
 '''
 ########################################################################################################################
