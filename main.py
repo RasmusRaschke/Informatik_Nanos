@@ -489,6 +489,7 @@ def cal():
         var_e_min = entry_emin.get()
         var_e_max = entry_emax.get()
         var_max_wells = entry_maxwells.get()
+        accuracy_exp = 0.00000001
         E = 1
         u_1 = .01
         u_0 = .0
@@ -534,8 +535,6 @@ def cal():
         var_max_bound = entry_max_bound.get()
         var_accuracy_cheap = entry_accuracy_cheap.get()
         var_start = entry_start.get()
-        var_E_0 = entry_E_0.get()
-        var_E_max = entry_Emax.get()
         var_e_min = entry_emin.get()
         var_e_max = entry_emax.get()
         var_max_wells = entry_maxwells.get()
@@ -666,7 +665,7 @@ def adv():
     if on:
 
         frame_start = tk.Frame(master=window, bd=5)
-        label_start = tk.Label(master=frame_start, text="first interval of the eigenvalue search((Default is 0.01", width=40)
+        label_start = tk.Label(master=frame_start, text="First interval of the eigenvalue search (Default: 0.01)", width=40)
         label_start.pack(side=tk.LEFT)
 
         entry_start = tk.Entry(master=frame_start, width=20)
@@ -675,7 +674,7 @@ def adv():
         frame_start.pack(anchor="nw")
 
         frame_accuracy_exp = tk.Frame(master=window, bd=5)
-        label_accuracy_exp = tk.Label(master=frame_accuracy_exp, text="Accuracy of the NR method(Default is 0.00000001)", width=40)
+        label_accuracy_exp = tk.Label(master=frame_accuracy_exp, text="Accuracy of the NR method (Default: 0.00000001)", width=40)
         label_accuracy_exp.pack(side=tk.LEFT)
 
         entry_accuracy_exp = tk.Entry(master=frame_accuracy_exp, width=20)
@@ -685,7 +684,7 @@ def adv():
 
 
         frame_N = tk.Frame(master=window, bd=5)
-        label_N = tk.Label(master=frame_N, text="resolution of the potential(Default is 1000 )", width=40)
+        label_N = tk.Label(master=frame_N, text="Resolution of the potential (Default: 1000)", width=40)
         label_N.pack(side=tk.LEFT)
 
         entry_N = tk.Entry(master=frame_N, width=20)
@@ -694,7 +693,7 @@ def adv():
         frame_N.pack(anchor="nw")
 
         frame_max_bound = tk.Frame(master=window, bd=5)
-        label_max_bound = tk.Label(master=frame_max_bound, text="maximum iterations of the NR method", width=40)
+        label_max_bound = tk.Label(master=frame_max_bound, text="Maximum iterations of the NR method", width=40)
         label_max_bound.pack(side=tk.LEFT)
 
         entry_max_bound = tk.Entry(master=frame_max_bound, width=20)
@@ -703,7 +702,7 @@ def adv():
         frame_max_bound.pack(anchor="nw")
 
         frame_u_0 = tk.Frame(master=window, bd=5)
-        label_u_0 = tk.Label(master=frame_u_0, text="1st Boundary condition of the Numerov method", width=40)
+        label_u_0 = tk.Label(master=frame_u_0, text="1st boundary condition of the Numerov method", width=40)
         label_u_0.pack(side=tk.LEFT)
 
         entry_u_0 = tk.Entry(master=frame_u_0, width=20)
@@ -712,7 +711,7 @@ def adv():
         frame_u_0.pack(anchor="nw")
 
         frame_u_1 = tk.Frame(master=window, bd=5)
-        label_u_1 = tk.Label(master=frame_u_1, text="2nd Boundary condition of the Numerov method", width=40)
+        label_u_1 = tk.Label(master=frame_u_1, text="2nd boundary condition of the Numerov method", width=40)
         label_u_1.pack(side=tk.LEFT)
 
         entry_u_1 = tk.Entry(master=frame_u_1, width=20)
@@ -722,7 +721,7 @@ def adv():
         
         # create the label for xmin
         frame_xmin = tk.Frame(master=window, bd=5)
-        label_xmin = tk.Label(master=frame_xmin, text="Start of the plot(default is 0)", width=40)
+        label_xmin = tk.Label(master=frame_xmin, text="Start of the plot (default: 0)", width=40)
         label_xmin.pack(side=tk.LEFT)
 
         entry_xmin = tk.Entry(master=frame_xmin, width=20)
@@ -734,7 +733,7 @@ def adv():
 
         frame_xmax = tk.Frame(master=window, bd=5)
         
-        label_xmax = tk.Label(master=frame_xmax, text="End of the Plot (default is 10)", width=40)
+        label_xmax = tk.Label(master=frame_xmax, text="End of the Plot (default: 10)", width=40)
         label_xmax.pack(side=tk.LEFT)
         
         entry_xmax = tk.Entry(master=frame_xmax, width=20)
@@ -755,19 +754,19 @@ def adv():
         # create frames and entries for the variables for the electric fiel 
         
         frame_Charge = tk.Frame(master=window, bd=5)
-        label_charge = tk.Label(master=frame_Charge, text="charge of the particle", width=40)
+        label_charge = tk.Label(master=frame_Charge, text="Charge of the particle", width=40)
         label_charge.pack(side=tk.LEFT)
         
-        entry_charge = tk.Entry(master=frame_Charge,width=20)
+        entry_charge = tk.Entry(master=frame_Charge, width=20)
         entry_charge.pack(side=tk.LEFT)
         
-        frame_Charge.pack(anchor ="nw")
+        frame_Charge.pack(anchor="nw")
         
         frame_el_field = tk.Frame(master=window, bd=5)
         label_el_field = tk.Label(master=frame_el_field, text="Electric field in [eV^2]", width=40)
         label_el_field.pack(side=tk.LEFT)
         
-        entry_el_field = tk.Entry(master=frame_el_field,width = 20)
+        entry_el_field = tk.Entry(master=frame_el_field, width=20)
         entry_el_field.pack(side=tk.LEFT)
         
         frame_el_field.pack(anchor="nw")

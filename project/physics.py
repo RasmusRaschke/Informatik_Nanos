@@ -465,7 +465,7 @@ accuracy_cheap = 0.01 #Genauigkeit
 e_min = -8 #untere Grenze der Eigenwertsuche
 e_max = 15 #obere Grenze der Eigenwertsuche
 max_wells = 200 #Kastenanzahl für Bandberechnung
-filename = 'test' #NICHT IN GUI
+filename = 'tessst' #NICHT IN GUI
 legend = 0 #NICHT IN GUI
 charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
 el_field = 0.05 #Elektrisches Feld in [eV^2]
@@ -507,7 +507,7 @@ plt.plot(average_x, plot_average_2, label="Zwei Kästen")
 plt.plot(average_x, plot_average_3, label="Zehn Kästen")
 plt.legend(loc='upper right')
 plt.grid(True)
-plt.xlabel(r"Topfabstand in $[nm]$")
+plt.xlabel(r"Kastenbreite in $[nm]$")
 plt.ylabel(r'Mittel der ersten drei Eigenenergien in $[eV]$')
 plt.savefig('/home/rasmus/Informatik_Nanos/plots/width_averages.png', dpi=1200)
 plt.show()
