@@ -481,6 +481,9 @@ def cal():
     global on, E_max, u_0, u_1, max_bound, E_0, N, start, v_0, x_0, L, x_min, x_max, wells, E, accuracy_cheap, e_min, e_max, max_wells, on, el_field, electric, charge
     global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0, entry_charge, entry_start, entry_el_field, accuracy_cheap, entry_accuracy_exp
     if on:
+       
+        electric = electric2.get()
+        
         var_v_0 = entry_tiefe.get()
         var_x_0 = entry_abstand.get()
         var_L = entry_breite.get()
@@ -522,6 +525,8 @@ def cal():
 
         return
     else:
+        electric = electric2.get()
+        
         var_v_0 = entry_tiefe.get()
         var_x_0 = entry_abstand.get()
         var_L = entry_breite.get()
@@ -572,6 +577,8 @@ def calbands():
     global on, E_max, u_0, u_1, max_bound, E_0, N, start, v_0, x_0, L, x_min, x_max, wells, E, accuracy_cheap, e_min, e_max, max_wells, on
     global entry_Emax, entry_start, entry_N, entry_E_0, entry_u_1, entry_u_0, entry_accuracy_cheap, charge, electric, el_field, accuracy_exp
     if on:
+        electric = electric2.get()
+        
         var_v_0 = entry_tiefe.get()
         var_x_0 = entry_abstand.get()
         var_L = entry_breite.get()
@@ -610,6 +617,8 @@ def calbands():
 
         return
     else:
+        electric = electric2.get()
+        
         var_v_0 = entry_tiefe.get()
         var_x_0 = entry_abstand.get()
         var_L = entry_breite.get()
@@ -877,14 +886,15 @@ entry_tiefe.pack(side=tk.LEFT)
 button_calc = ttk.Button(master=frame_knöpfe, text="Exit", command=window.destroy)
 button_calc.pack(side=tk.RIGHT, )
 
-button_calc = ttk.Button(master=frame_knöpfe, text="Calculate", command=cal)
-button_calc.pack(side=tk.RIGHT, )
-
 button_clear = ttk.Button(master=frame_knöpfe, text="Clear", command=clear)
 button_clear.pack(side=tk.RIGHT, )
 
-button_clear = ttk.Button(master=frame_knöpfe, text="Plot Bands", command= calbands)
+button_clear = ttk.Button(master=frame_knöpfe, text="Plot Energies", command= calbands)
 button_clear.pack(side=tk.RIGHT, )
+
+button_calc = ttk.Button(master=frame_knöpfe, text="Plot Functions", command=cal)
+button_calc.pack(side=tk.RIGHT, )
+
 
 # create the label for distance between the pots
 
@@ -931,9 +941,9 @@ Button_advance = ttk.Button(master=frame_advance, text="Advance Options", comman
 Button_advance.pack(side=tk.LEFT)
 
 
-electric = tk.IntVar()
+electric2 = tk.IntVar()
 
-c = tk.Checkbutton(master = frame_knöpfe, text = "ELectric Field", variable = electric, onvalue = 0, offvalue = 1)
+c = tk.Checkbutton(master = frame_knöpfe, text = "ELectric Field", variable = electric2, onvalue = 0, offvalue = 1)
 
 c.pack(side=tk.RIGHT)
 
