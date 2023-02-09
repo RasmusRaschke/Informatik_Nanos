@@ -390,7 +390,7 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filen
     plt.legend(loc='upper left')
     if legend == 1:
         plt.legend('', frameon=False)
-    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000)
+    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000, bbox_inches='tight')
     plt.show()
 
 
@@ -451,21 +451,21 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
     plt.grid(True)
     ax.set_xlabel(r'Kastenanzahl')
     ax.set_ylabel(r'Eigenenergien in $[eV]$')
-    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000)
+    plt.savefig('/home/rasmus/Informatik_Nanos/plots/%s.png'%filename, dpi=1000, bbox_inches='tight')
     plt.show()
 
 
 ########################################################################################################################
 #Variablen hier
 v_0 = 8 #Kastentiefe in [eV]
-x_0 = 2 #Startpunkt des ersten Kastens in [nm]
-L = 0.287 #Kastenbreite in [nm]; Silber: 0.287
-wells = 2 #Kastenanzahl
-accuracy_cheap = 0.01 #Genauigkeit
-e_min = -8 #untere Grenze der Eigenwertsuche
-e_max = 15 #obere Grenze der Eigenwertsuche
-max_wells = 200 #Kastenanzahl für Bandberechnung
-filename = 'tessst' #NICHT IN GUI
+x_0 = 0.17 #Startpunkt des ersten Kastens in [nm]
+L = 0.24 #Kastenbreite in [nm]; Silber: 0.287
+wells = 14 #Kastenanzahl
+accuracy_cheap = 0.0001 #Genauigkeit
+e_min = -4 #untere Grenze der Eigenwertsuche
+e_max = 4 #obere Grenze der Eigenwertsuche
+max_wells = 20 #Kastenanzahl für Bandberechnung
+filename = 'silver_nano_crystallite_exact_band' #NICHT IN GUI
 legend = 0 #NICHT IN GUI
 charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
 el_field = 0.05 #Elektrisches Feld in [eV^2]
@@ -481,17 +481,27 @@ x_min = 0 #ENTWICKLEROPTION; Beginn des Plots
 x_max = 10 #ENTWICKLEROPTION; Ende des Plots
 ########################################################################################################################
 #Berechnung #SO FUNKTIONIERT DAS PROGRAMM MIT DEN AKTUELLEN VARIABLEN
+'''
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
                                                     accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
                                                     electric)
-#plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
+plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
 
-plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
-           max_wells, charge, el_field, electric, filename)
-
+#plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
+           #max_wells, charge, el_field, electric, filename)
+'''
+########################################################################################################################
+'''
+Parameter
+---Silber-Bandgap---
+a = 4.08160 nm (Gitterkonstante fcc, Rä)
+L = 1.20 nm (berechnet aus a)
+n = 16
+'''
 ########################################################################################################################
 #EINFACH IGNORIEREN
-'''
+
+
 average_x = [1, 1.5, 2, 2.5, 3, 5, 10]
 plot_average_1 = [-0.2559052422454842, -0.34271239128133507, -0.38613615166845133, -0.4105402983419828, 
 -0.4257988851412097, -0.45321103550772684, -0.47045380448876606]
@@ -511,7 +521,7 @@ plt.xlabel(r"Kastenbreite in $[nm]$")
 plt.ylabel(r'Mittel der ersten drei Eigenenergien in $[eV]$')
 plt.savefig('/home/rasmus/Informatik_Nanos/plots/width_averages.png', dpi=1200)
 plt.show()
-'''
+
 
 '''
 fign, axn = plt.subplots()
