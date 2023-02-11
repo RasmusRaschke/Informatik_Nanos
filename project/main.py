@@ -668,7 +668,7 @@ def calbands():
 # Define the adv funtction to show and hide advance options
 
 def adv():
-    # set all Variables to global so they can be used in other functions too
+    # set all Variables to global so they can be used in other functions as well
 
     global on, accuracy_exp, u_0, u_1, max_bound, N, start, x_min, x_max, E, charge, el_field, electric
     global frame_accuracy_exp, frame_start, frame_N, frame_u_1, frame_u_0, frame_max_bound, frame_xmax, frame_xmin, frame_E, frame_Charge, frame_el_field
@@ -763,7 +763,7 @@ def adv():
         
         frame_E.pack(anchor="nw")
         
-        # create frames and entries for the variables for the electric fiel 
+        # create frames and entries for the variables for the electric field
         
         frame_Charge = tk.Frame(master=window, bd=5)
         label_charge = tk.Label(master=frame_Charge, text="Charge of the particle(Default is 0.30282212)", width=40)
