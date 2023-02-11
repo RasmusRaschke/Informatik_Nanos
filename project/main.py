@@ -12,16 +12,15 @@ from tkinter import ttk
 
 window = tk.Tk()
 
-# creat a list of created wigedts, because its easier to delete them afterwards
+# create a list of created widgets, because it's easier to delete them afterwards
 
 list_of_widget = []
 
 list_of_widget2 = []
 
-# Define On as 1, because it will be used in the adv function as a turn on switch
+# Define On as 1, because it will be used in the adv function as a turn-on switch
 
 on = 1
-
 
 def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1):
     """Get equally spaced potential wells of defined width and depth; calculate correspondent x-axis in nm
@@ -39,8 +38,14 @@ def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1
         start of x-axis
     x_max : float
         end of x-axis
+    charge : float
+        charge of the particle in natural units
+    el_field : float
+        strength of the applied electric field in natural units
     wells : int, optional
         number of equally spaced wells, default = 1
+    electric : bool, optional
+        decide if electric field should be applied to potential
     Returns
     -------
     v : float list
@@ -156,7 +161,7 @@ def norm(u):
     return u_norm
 
 
-def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
+def find_zeros(u_0, u_1, v, counter, x_min, x_max, e_min, e_max, accuracy):
     """cheap method to find zeros in wavefunction by sign change
         Parameters
         ----------
@@ -172,8 +177,6 @@ def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
             start of x-axis
         x_max : float
             end of x-axis
-        N : int
-            number of steps
         e_min : float
             starting point for energy search
         e_max : float
@@ -202,7 +205,7 @@ def find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy):
     return eigen
 
 
-def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate, accuracy, differential):
+def newton_raphson(u_0, u_1, counter, x_min, x_max, v, max_bound, eigen_estimate, accuracy, differential):
     """algorithm to increase the accuracy of found zeros
         Parameters
         ----------
@@ -216,8 +219,6 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
             start of x-axis
         x_max : float
             end of x-axis
-        N : int
-            number of steps
         v : float list
             potential well defined as 1-D array
         max_bound : int
@@ -225,7 +226,7 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
         eigen_estimate : float
             eigenenergy from the inaccurate method
         accuracy : float
-            convergence criterium for zeros
+            accuracy of search for zeros (convergence criterium)
         differential : float
             first step to calculate the new energy
         Returns
@@ -253,7 +254,7 @@ def newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estim
     return e_new
 
 
-def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, start, eigen_estimate):
+def correct_zeros(u_0, u_1, counter, x_min, x_max, v, max_bound, accuracy, start, eigen_estimate):
     """algorithm to increase the accuracy of found zeros
         Parameters
         ----------
@@ -267,8 +268,6 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, st
             start of x-axis
         x_max : float
             end of x-axis
-        N : int
-            number of steps
         v : float list
             potential well defined as 1-D array
         max_bound : int
@@ -286,7 +285,7 @@ def correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy, st
         """
     eigen_corrected = []
     for i in range(len(eigen_estimate)):
-        e = newton_raphson(u_0, u_1, counter, x_min, x_max, N, v, max_bound, eigen_estimate[i], accuracy, start)
+        e = newton_raphson(u_0, u_1, counter, x_min, x_max, v, max_bound, eigen_estimate[i], accuracy, start)
         eigen_corrected.append(e)
     return eigen_corrected
 
@@ -318,12 +317,20 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
             starting point for energy search
         e_max : float
             ending point for energy search
-        accuracy : float
-            accuracy of search for zeros
+        accuracy_cheap : float
+            accuracy of sign change zero search
+        accuracy_exp : float
+            accuracy of NR-method
         max_bound : int
             maximal amount of iterations if control doesn't get low enough
         start : float
             first step to calculate the new energy
+        charge : float
+            charge of the particle in natural units
+        el_field : float
+            strength of the applied electric field in natural units
+        electric : bool, optional
+            decide if electric field should be applied to potential
         Returns
         -------
         eigen_correct : float list
@@ -336,15 +343,12 @@ def calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, 
             returns len of v and x
         """
     x, v, counter = periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells, electric)
-    eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, N, e_min, e_max, accuracy_cheap)
-    eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, N, v, max_bound, accuracy_exp, start, eigen_simple)
+    eigen_simple = find_zeros(u_0, u_1, v, counter, x_min, x_max, e_min, e_max, accuracy_cheap)
+    eigen_correct = correct_zeros(u_0, u_1, counter, x_min, x_max, v, max_bound, accuracy_exp, start, eigen_simple)
     return eigen_correct, x, v, counter
 
 
 def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs=0):
-    # set the variables to global 
-    global canvas, list_of_widget
-
     """Calculate and plot eigenstates with given eigenenergies
             Parameters
             ----------
@@ -362,11 +366,13 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
                 start of x-axis
             x_max : float
                 end of x-axis
-            N : int
-                steps for resolution
+            graphs : int
+                shows the first "graphs"-th eigenfunctions; default: 0 (all eigenfunctions are shown)
             Returns
             -------
             """
+    # set the variables to global
+    global canvas, list_of_widget
     fig, ax = plt.subplots()
     ax.plot(dpi=1000)
     ax.plot(x, v, c="black")
@@ -398,13 +404,9 @@ def plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graph
     plt.legend(loc='upper left')
 
     # create a widget to show the plot in the GUI
-
     canvas = FigureCanvasTkAgg(fig, frame_Graph)
-
     canvas.get_tk_widget().pack(side=tk.RIGHT, anchor="ne")
-
     list_of_widget.append(canvas.get_tk_widget())
-
     return
 
 
@@ -433,27 +435,26 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
                 starting point for energy search
             e_max : float
                 ending point for energy search
-            accuracy : float
-                accuracy of search for zeros
+            accuracy_cheap : float
+                accuracy of sign change zero search
+            accuracy_exp : float
+                accuracy of NR-method
             max_bound : int
                 maximal amount of iterations if control doesn't get low enough
             start : float
                 first step to calculate the new energy
             max_wells : int
-                number of wells for which eigenenergies should be calculated
+                calculate eigenenergies for up to max_wells-amount of wells
+            charge : float
+                charge of the particle in natural units
+            el_field : float
+                strength of the applied electric field in natural units
+            electric : bool, optional
+                decide if electric field should be applied to potential
             Returns
             -------
-            eigen_correct : float list
-                list of eigenenergies in [eV]
-            x : float list
-                x-axis in nm
-            v : float list
-                1-D potential array
-            counter : int
-                returns len of v and x
             """
-    # set the variables to global 
-    
+    # set the variables to global
     global canvas2, list_of_widget2
     
     fig, ax = plt.subplots()
@@ -468,9 +469,7 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
     plt.show()
 
     canvas2 = FigureCanvasTkAgg(fig, frame_Graph2)
-
     canvas2.get_tk_widget().pack(side=tk.RIGHT, anchor="se")
-
     list_of_widget2.append(canvas2.get_tk_widget())
     return 
 
@@ -494,7 +493,7 @@ def cal():
         var_max_wells = entry_maxwells.get()
         accuracy_exp = 0.00000001
         E = 1
-        u_1 = .01
+        u_1 = .001
         u_0 = .0
         E_max = 0
         on = 1
@@ -516,13 +515,10 @@ def cal():
         e_min = float(var_e_min)
         e_max = float(var_e_max)
         max_wells = int(var_max_wells)
-
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
                                                     accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
                                                      electric)
         plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs)
-       
-
         return
     else:
         electric = electric2.get()
@@ -566,10 +562,10 @@ def cal():
         e_max = float(var_e_max)
         max_wells = int(var_max_wells)
         on = 0
+        graphs = 0
         eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min,
                                                              e_max, accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field, electric)
-        plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, 2)
-        
+        plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, graphs)
         return
 
 def calbands():
@@ -609,9 +605,6 @@ def calbands():
         e_max = float(var_e_max)
         max_wells = int(var_max_wells)
 
-        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                    accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
-                                                     electric)
         plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
            max_wells, charge, el_field, electric)
 
@@ -652,15 +645,10 @@ def calbands():
         accuracy_cheap = float(var_accuracy_cheap)
         start = float(var_start)
         accuracy_exp = float(var_accuracy_exp)
-        
         e_min = float(var_e_min)
         e_max = float(var_e_max)
         max_wells = int(var_max_wells)
         on = 0
-        eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                    accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
-                                                     electric)
-        
         plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
            max_wells, charge, el_field, electric)
         return
@@ -677,7 +665,7 @@ def adv():
     if on:
 
         frame_start = tk.Frame(master=window, bd=5)
-        label_start = tk.Label(master=frame_start, text="First interval of the eigenvalue search (Default: 0.01)", width=40)
+        label_start = tk.Label(master=frame_start, text="Erstes Intervall für Eigenwerte (Default: 0.01)", width=40)
         label_start.pack(side=tk.LEFT)
 
         entry_start = tk.Entry(master=frame_start, width=20)
@@ -686,7 +674,7 @@ def adv():
         frame_start.pack(anchor="nw")
 
         frame_accuracy_exp = tk.Frame(master=window, bd=5)
-        label_accuracy_exp = tk.Label(master=frame_accuracy_exp, text="Accuracy of the NR method (Default: 0.00000001)", width=40)
+        label_accuracy_exp = tk.Label(master=frame_accuracy_exp, text="Genauigkeit von NR (Default: 0.00000001)", width=40)
         label_accuracy_exp.pack(side=tk.LEFT)
 
         entry_accuracy_exp = tk.Entry(master=frame_accuracy_exp, width=20)
@@ -696,7 +684,7 @@ def adv():
 
 
         frame_N = tk.Frame(master=window, bd=5)
-        label_N = tk.Label(master=frame_N, text="Resolution of the potential (Default: 1000)", width=40)
+        label_N = tk.Label(master=frame_N, text="Potentialauflösung (Default: 1000)", width=40)
         label_N.pack(side=tk.LEFT)
 
         entry_N = tk.Entry(master=frame_N, width=20)
@@ -705,7 +693,7 @@ def adv():
         frame_N.pack(anchor="nw")
 
         frame_max_bound = tk.Frame(master=window, bd=5)
-        label_max_bound = tk.Label(master=frame_max_bound, text="Maximum iterations of the NR method(1000000)", width=40)
+        label_max_bound = tk.Label(master=frame_max_bound, text="Maximale Iterationen (Default: 1000000)", width=40)
         label_max_bound.pack(side=tk.LEFT)
 
         entry_max_bound = tk.Entry(master=frame_max_bound, width=20)
@@ -714,7 +702,7 @@ def adv():
         frame_max_bound.pack(anchor="nw")
 
         frame_u_0 = tk.Frame(master=window, bd=5)
-        label_u_0 = tk.Label(master=frame_u_0, text="1st boundary condition of the Numerov method(.0)", width=40)
+        label_u_0 = tk.Label(master=frame_u_0, text="Erste Randbedingung (Default: .0)", width=40)
         label_u_0.pack(side=tk.LEFT)
 
         entry_u_0 = tk.Entry(master=frame_u_0, width=20)
@@ -723,7 +711,7 @@ def adv():
         frame_u_0.pack(anchor="nw")
 
         frame_u_1 = tk.Frame(master=window, bd=5)
-        label_u_1 = tk.Label(master=frame_u_1, text="2nd boundary condition of the Numerov method(.001)", width=40)
+        label_u_1 = tk.Label(master=frame_u_1, text="Zweite Randbedingung (Default: .001)", width=40)
         label_u_1.pack(side=tk.LEFT)
 
         entry_u_1 = tk.Entry(master=frame_u_1, width=20)
@@ -733,7 +721,7 @@ def adv():
         
         # create the label for xmin
         frame_xmin = tk.Frame(master=window, bd=5)
-        label_xmin = tk.Label(master=frame_xmin, text="Start of the plot (default: 0)", width=40)
+        label_xmin = tk.Label(master=frame_xmin, text="Ursprung des Potentials (Default: 0)", width=40)
         label_xmin.pack(side=tk.LEFT)
 
         entry_xmin = tk.Entry(master=frame_xmin, width=20)
@@ -745,7 +733,7 @@ def adv():
 
         frame_xmax = tk.Frame(master=window, bd=5)
         
-        label_xmax = tk.Label(master=frame_xmax, text="End of the Plot (default: 10)", width=40)
+        label_xmax = tk.Label(master=frame_xmax, text="Rechte Potentialbegrenzung (Default: 10)", width=40)
         label_xmax.pack(side=tk.LEFT)
         
         entry_xmax = tk.Entry(master=frame_xmax, width=20)
@@ -755,7 +743,7 @@ def adv():
         
         frame_E = tk.Frame(master=window, bd=5)
         
-        label_E = tk.Label(master=frame_E, text="Energy of the K-List in [eV](default is 1)", width=40)
+        label_E = tk.Label(master=frame_E, text="K-Liste-Energie [eV] (Default: 1.0)", width=40)
         label_E.pack(side=tk.LEFT)
 
         entry_E = tk.Entry(master=frame_E, width=20)
@@ -766,7 +754,7 @@ def adv():
         # create frames and entries for the variables for the electric fiel 
         
         frame_Charge = tk.Frame(master=window, bd=5)
-        label_charge = tk.Label(master=frame_Charge, text="Charge of the particle(Default is 0.30282212)", width=40)
+        label_charge = tk.Label(master=frame_Charge, text="Teilchenladung (Default: 0.30282212)", width=40)
         label_charge.pack(side=tk.LEFT)
         
         entry_charge = tk.Entry(master=frame_Charge, width=20)
@@ -775,7 +763,7 @@ def adv():
         frame_Charge.pack(anchor="nw")
         
         frame_el_field = tk.Frame(master=window, bd=5)
-        label_el_field = tk.Label(master=frame_el_field, text="Electric field in [eV^2](Default is 0.001) ", width=40)
+        label_el_field = tk.Label(master=frame_el_field, text="Elektrische Feldstärke [eV^2] (Default: 0.001 eV^2) ", width=40)
         label_el_field.pack(side=tk.LEFT)
         
         entry_el_field = tk.Entry(master=frame_el_field, width=20)
@@ -800,7 +788,7 @@ def adv():
         frame_el_field.destroy()
         
         el_field = 0.001
-        u_1 = .01
+        u_1 = .001
         u_0 = .0
         accuracy_exp = 0.00000001
         on = 1
@@ -810,7 +798,7 @@ def adv():
         x_min = 0
         x_max = 10
         charge = 0.30282212
-        E = 1
+        E = 1.
 
 def clear():
     global canvas, list_of_widget, canvas2, list_of_widget2
@@ -858,7 +846,7 @@ frame_advance = tk.Frame(master=window, bd=5)
 
 # create the label for the number of the pots with an entry
 
-label_töpfe = tk.Label(master=frame_töpfe, text="Number of wells", width=40)
+label_töpfe = tk.Label(master=frame_töpfe, text="Kastenanzahl", width=40)
 label_töpfe.pack(side=tk.LEFT)
 
 entry_töpfe = tk.Entry(master=frame_töpfe, width=20)
@@ -866,7 +854,7 @@ entry_töpfe.pack(side=tk.LEFT)
 
 # create the label for the wight of the pots with an entry
 
-label_breite = tk.Label(master=frame_breite, text="Width of the wells(in nm)", width=40)
+label_breite = tk.Label(master=frame_breite, text="Kastenbreite [nm]", width=40)
 label_breite.pack(side=tk.LEFT)
 
 entry_breite = tk.Entry(master=frame_breite, width=20)
@@ -874,7 +862,7 @@ entry_breite.pack(side=tk.LEFT)
 
 # create the label for the depth of the pots  with an entry
 
-label_tiefe = tk.Label(master=frame_tiefe, text="Depth of the wells(in nm)", width=40)
+label_tiefe = tk.Label(master=frame_tiefe, text="Kastentiefe [eV]", width=40)
 label_tiefe.pack(side=tk.LEFT)
 
 entry_tiefe = tk.Entry(master=frame_tiefe, width=20)
@@ -883,22 +871,22 @@ entry_tiefe.pack(side=tk.LEFT)
 # create two buttons to clalculate and close the window
 # and a button to clear the graphs
 
-button_calc = ttk.Button(master=frame_knöpfe, text="Exit", command=window.destroy)
+button_calc = ttk.Button(master=frame_knöpfe, text="Beenden", command=window.destroy)
 button_calc.pack(side=tk.RIGHT, )
 
-button_clear = ttk.Button(master=frame_knöpfe, text="Clear", command=clear)
+button_clear = ttk.Button(master=frame_knöpfe, text="Löschen", command=clear)
 button_clear.pack(side=tk.RIGHT, )
 
-button_clear = ttk.Button(master=frame_knöpfe, text="Plot Energies", command= calbands)
+button_clear = ttk.Button(master=frame_knöpfe, text="Energien", command= calbands)
 button_clear.pack(side=tk.RIGHT, )
 
-button_calc = ttk.Button(master=frame_knöpfe, text="Plot Functions", command=cal)
+button_calc = ttk.Button(master=frame_knöpfe, text="Funktionen", command=cal)
 button_calc.pack(side=tk.RIGHT, )
 
 
 # create the label for distance between the pots
 
-label_abstand = tk.Label(master=frame_abstand, text="Distance between the wells(in nm)", width=40)
+label_abstand = tk.Label(master=frame_abstand, text="Kastenabstand [nm]", width=40)
 label_abstand.pack(side=tk.LEFT)
 
 entry_abstand = tk.Entry(master=frame_abstand, width=20)
@@ -906,7 +894,7 @@ entry_abstand.pack(side=tk.LEFT)
 
 # create the label for emin
 
-label_emin = tk.Label(master=frame_emin, text="lower limit of the eigenvalue search", width=40)
+label_emin = tk.Label(master=frame_emin, text="Untere Grenze der Eigenwerte [eV]", width=40)
 label_emin.pack(side=tk.LEFT)
 
 entry_emin = tk.Entry(master=frame_emin, width=20)
@@ -914,7 +902,7 @@ entry_emin.pack(side=tk.LEFT)
 
 # create the label for emax
 
-label_emax = tk.Label(master=frame_emax, text="upper limit of the eigenvalue search", width=40)
+label_emax = tk.Label(master=frame_emax, text="Obere Grenze der Eigenwerte [eV]", width=40)
 label_emax.pack(side=tk.LEFT)
 
 entry_emax = tk.Entry(master=frame_emax, width=20)
@@ -922,7 +910,7 @@ entry_emax.pack(side=tk.LEFT)
 
 # create the label for accuracy
 
-label_accuracy_cheap = tk.Label(master=frame_accuracy_cheap, text="accuracy", width=40)
+label_accuracy_cheap = tk.Label(master=frame_accuracy_cheap, text="Genauigkeit", width=40)
 label_accuracy_cheap.pack(side=tk.LEFT)
 
 entry_accuracy_cheap = tk.Entry(master=frame_accuracy_cheap, width=20)
@@ -930,20 +918,20 @@ entry_accuracy_cheap.pack(side=tk.LEFT)
 
 # create the label for maxwells
 
-label_maxwells = tk.Label(master=frame_maxwells, text="number of wells for the calculation", width=40)
+label_maxwells = tk.Label(master=frame_maxwells, text="Maximale Kastenzahl für Energien", width=40)
 label_maxwells.pack(side=tk.LEFT)
 
 entry_maxwells = tk.Entry(master=frame_maxwells, width=20)
 entry_maxwells.pack(side=tk.LEFT)
 
 # create a button for advance GUI options
-Button_advance = ttk.Button(master=frame_advance, text="Advance Options", command=adv)
+Button_advance = ttk.Button(master=frame_advance, text="Entwickleroptionen", command=adv)
 Button_advance.pack(side=tk.LEFT)
 
 
 electric2 = tk.IntVar()
 
-c = tk.Checkbutton(master = frame_knöpfe, text = "ELectric Field", variable = electric2, onvalue = 0, offvalue = 1)
+c = tk.Checkbutton(master = frame_knöpfe, text = "E-Feld", variable = electric2, onvalue = 0, offvalue = 1)
 
 c.pack(side=tk.RIGHT)
 
