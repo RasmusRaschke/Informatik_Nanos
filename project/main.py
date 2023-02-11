@@ -932,7 +932,7 @@ Button_advance.pack(side=tk.LEFT)
 electric2 = tk.IntVar()
 
 c = tk.Checkbutton(master = frame_knöpfe, text = "E-Feld", variable = electric2, onvalue = 0, offvalue = 1)
-
+c.deselect()
 c.pack(side=tk.RIGHT)
 
 # pack all the frames, buttons and labels
