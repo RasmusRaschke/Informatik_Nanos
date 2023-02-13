@@ -9,7 +9,7 @@ def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1
     Parameters
     ----------
     v_0 : float
-        depth of potential wells in eV; inversed wells (walls) aren't supported right now
+        depth of potential wells in eV; walls are supported too!
     x_0 : float
         point where the first well begins
     L : float
@@ -32,9 +32,6 @@ def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1
     counter : int
         returns len of v and x
     """
-    #error handling: set walls of well to 0
-    if v_0 < 0:
-        v_0 = - v_0
     v = []
     x = []
     h = (x_max - x_min) / N
@@ -457,15 +454,15 @@ def plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_ch
 
 ########################################################################################################################
 #Variablen hier
-v_0 = 8 #Kastentiefe in [eV]
-x_0 = 0.17 #Startpunkt des ersten Kastens in [nm]
-L = 0.24 #Kastenbreite in [nm]; Silber: 0.287
-wells = 14 #Kastenanzahl
-accuracy_cheap = 0.0001 #Genauigkeit
-e_min = -4 #untere Grenze der Eigenwertsuche
-e_max = 4 #obere Grenze der Eigenwertsuche
-max_wells = 20 #Kastenanzahl für Bandberechnung
-filename = 'silver_nano_crystallite_exact_band' #NICHT IN GUI
+v_0 = 0.7 #Kastentiefe in [eV]; unterstützt jetzt auch Wände!
+x_0 = 0.01 #Startpunkt des ersten Kastens in [nm]
+L = 0.5 #Kastenbreite in [nm]
+wells = 2 #Kastenanzahl
+accuracy_cheap = 0.000001 #Genauigkeit
+e_min = -0.7 #untere Grenze der Eigenwertsuche
+e_max = 0 #obere Grenze der Eigenwertsuche
+max_wells = 1 #Kastenanzahl für Bandberechnung
+filename = 'exchange' #NICHT IN GUI
 legend = 0 #NICHT IN GUI
 charge = 0.30282212 #Ladung des Teilchens [einheitenlos]
 el_field = 0.05 #Elektrisches Feld in [eV^2]
@@ -474,34 +471,57 @@ E = 1. #ENTWICKLEROPTION; Energie der k-List in [eV]
 u_0 = .0 #ENTWICKLEROPTION; 1. Randbedingung des Numerov-Verfahrens
 u_1 = .001 #ENTWICKLEROPTION; 2. Randbedingung des Numerov-Verfahrens
 max_bound = 1000000 #ENTWICKLEROPTION; maximale Iterationen des NR-Verfahrens
-accuracy_exp = 0.00000001 #ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
-start = 0.000000001 #ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
-N = 1000 #ENTWICKLEROPTION #Auflösung des Potentials
+accuracy_exp = 0.0000000001 #ENTWICKLEROPTION; Genauigkeit des NR-Verfahrens
+start = 0.00001 #ENTWICKLEROPTION; erstes Intervall der Eigenwertsuche
+N = 10000 #ENTWICKLEROPTION #Auflösung des Potentials
 x_min = 0 #ENTWICKLEROPTION; Beginn des Plots
 x_max = 10 #ENTWICKLEROPTION; Ende des Plots
 ########################################################################################################################
-#Berechnung #SO FUNKTIONIERT DAS PROGRAMM MIT DEN AKTUELLEN VARIABLEN
-'''
+#Berechnung
+
 eigen_correct, x, v, counter = calculate_eigenvalues(v_0, x_0, u_0, u_1, L, N, x_min, x_max, wells, e_min, e_max,
-                                                    accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
-                                                    electric)
-plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend)
+                                                   accuracy_cheap, accuracy_exp, max_bound, start, charge, el_field,
+                                                   electric)
+plot_eigenstates(x, v, eigen_correct, u_0, u_1, counter, x_min, x_max, filename, legend, 2)
 
 #plot_bands(v_0, x_0, u_0, u_1, L, N, x_min, x_max, e_min, e_max, accuracy_cheap, accuracy_exp, max_bound, start,
            #max_wells, charge, el_field, electric, filename)
-'''
+
 ########################################################################################################################
+#Parameter
 '''
-Parameter
+---Austausch-Integral---
+v_0 = 0.7
+x_0 = [0.01, 0.05, 0.1, 0.15, 0.20, 0.25]
+L = 0.5
+accuracy_cheap = 0.00001
 ---Silber-Bandgap---
-a = 4.08160 nm (Gitterkonstante fcc, Rä)
+a = 4.08160 nm (Gitterkonstante, paper?)
 L = 1.20 nm (berechnet aus a)
 n = 16
 '''
 ########################################################################################################################
-#EINFACH IGNORIEREN
+#Datengenerierung und Plots
+'''
+distance = [0.01, 0.05, 0.1, 0.15, 0.20, 0.25]
+first_eigen = [-0.689491, -0.684300, -0.680023, -0.675633, -0.671008, -0.666136]
+second_eigen = [-0.684911, -0.683285, -0.679688, -0.675486, -0.670930, -0.666089]
+inter = []
+for i in range(len(first_eigen)):
+    inter.append(abs(first_eigen[i] - second_eigen[i]))
+plt.scatter(distance, first_eigen)
+plt.scatter(distance, second_eigen)
+plt.plot(distance, first_eigen, label="Erster Eigenwert")
+plt.plot(distance, second_eigen, label="Zweiter Eigenwert")
+plt.legend(loc='upper right')
+plt.grid(True)
+plt.xlabel(r"Kastenabstand in $[nm]$")
+plt.ylabel(r'Eigenenergien in $[eV]$')
+plt.savefig('/home/rasmus/Informatik_Nanos/plots/austausch2.png', dpi=1200, bbox_inches='tight')
+plt.show()
+'''
 
-
+'''
 average_x = [1, 1.5, 2, 2.5, 3, 5, 10]
 plot_average_1 = [-0.2559052422454842, -0.34271239128133507, -0.38613615166845133, -0.4105402983419828, 
 -0.4257988851412097, -0.45321103550772684, -0.47045380448876606]
@@ -521,7 +541,7 @@ plt.xlabel(r"Kastenbreite in $[nm]$")
 plt.ylabel(r'Mittel der ersten drei Eigenenergien in $[eV]$')
 plt.savefig('/home/rasmus/Informatik_Nanos/plots/width_averages.png', dpi=1200)
 plt.show()
-
+'''
 
 '''
 fign, axn = plt.subplots()

@@ -55,9 +55,6 @@ def periodic(v_0, x_0, L, N, x_min, x_max, charge, el_field, wells=1, electric=1
     counter : int
         returns len of v and x
     """
-    #error handling: set walls of well to 0
-    if v_0 < 0:
-        v_0 = - v_0
     v = []
     x = []
     h = (x_max - x_min) / N
