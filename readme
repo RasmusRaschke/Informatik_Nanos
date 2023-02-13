@@ -1,18 +1,28 @@
-Plan der Veranstaltung:
-Pflichtbetreuung (vier Termine):
-1.: Projektstart (Oktober, spätestens November; Projektskizze vorher erstellen!; Literatur vorher kennen (SGL lösen, Projekthintergrund); wenn bereit: E-Mail schreiben, Ideen anhängen, Termin vereinbaren)
-2.: Projektverlauf (Termin individuell, Dezember)
-3.: Vorbesprechung Präsentation (Januar, hier fertig sein; ca. zwei Wochen vor Präsentation)
-4.: Präsentation/Kolloquium (Semesterende/Februar, auch Nachtermin; Termin unbedingt auf Terminkollisionen prüfen; Ort: CFEL Bahrenfeld; 20 min Vortrag, 5 min Fragen)
--> Jederzeit mehr Termine buchbar; Termine auf Eigeninitiative hin buchen
-Projekteinteilung: A2
-Projektplan /-ideen:
-1. Vervollständigen des Programms für WF in periodischen Potentialen (fertig)
-2. Plot von Eigenwerten gegen Potentialtiefe und -anzahl (fertig)
-3. Entwicklung einer GUI in TKinter (nahezu fertig)
-4. Elektrisches Feld an Kristall anlegen (fertig)
----Präsentation---
-- Dokumentation und Git erwähnen
-- Blochfkt. noch plotten und vergleichen
-- GUI in Präsentation vorstellen
-- Feetback einbauen
+Ordnerstuktur:
+- code_vorlesung: Sämtlicher Beispielcode aus der Vorlesung
+- odp_files: opd-Dateien aus der Bildbearbeitung für die Präsentation
+- paper: Paper, die bei der Erarbeitung hilfreich waren oder direkt in die Präsentation eingeflossen sind.
+- plots: Für die Präsentation erstellte Plots.
+- project: Unser gesamter Projektcode
+- .git: Übliche git-File
+- .idea: Übliche idea-file
+- Präsentation.pdf: Präsentation für den 15.02.23
+
+Wie das Programm genutzt wird:
+- Die main.py-file enthält die gesamte GUI. Ein Ausführen startet diese entsprechend, woraufhin Input stattfinden kann. Beenden der GUI beendet das Programm automatisch.
+- Die physics.py-file ist der rein physikalisch-numerische Teil des Projekts. Hiermit wurden die Daten erstellt. Insgesamt sind die Optionen umfangreicher, da viele Einstellungen in einer GUI nicht gebraucht werden. Diese Datei ist geeignet, um in andere Projekte importiert zu werden.
+Plots werden automatisch im plots-folder gespeichert -> Vorsicht vor Überschreibungen
+- GUI.py beinhaltet die GUI ohne Anbindung an den physikalischen Teil.
+
+Funktionalität:
+1. Es können beliebig viele Potentialkästen erstellt und die Eigenzustände gesucht werden. Dabei können Kastenabstand, Kastenbreite und Kastentiefe individuell variiert werden.
+2. Es können Eigenenergien als Band-Plot für eine obere Beschränkung der Kastenzahl dargestellt werden.
+3. Ein statisches E-Feld kann an das System angelegt werden.
+4. Die Kästen sind auch invertierbar und können somit als Wände fungieren.
+
+Achtung vor langen, leistungsintensiven Rechnungen. Die Nullstellensuche und die Potentialauflösung sind die langsamsten Schritte und können schnell zu Rechenzeiten > 12h führen.
+
+TODO:
+- Nullstellensuche in effizienterer Sprache o. generell effizientere Methode implementieren.
+- Eventuell Zeitentwicklung der ungebundenen Zustände (v.a. für periodische Wände statt Kästen).
+- Stabileren ODE-Solver implementieren oder SGL-spezifische Methode wählen. 
