@@ -10,9 +10,17 @@ Ordnerstuktur:
 
 Wie das Programm genutzt wird:
 - Die main.py-file enthält die gesamte GUI. Ein Ausführen startet diese entsprechend, woraufhin Input stattfinden kann. Beenden der GUI beendet das Programm automatisch.
+
 - Die physics.py-file ist der rein physikalisch-numerische Teil des Projekts. Hiermit wurden die Daten erstellt. Insgesamt sind die Optionen umfangreicher, da viele Einstellungen in einer GUI nicht gebraucht werden. Diese Datei ist geeignet, um in andere Projekte importiert zu werden.
+
+calculate_eigenvalues wird in Kombination mit plot_eigenstates genutzt, um die Eigenfunktionen zusammen mit ihren Eigenenergien in einem Plot im Potential darzustellen.
+
+plot_bands kann ohne vorgeschaltete Eigenwertsuche direkt eingesetzt werden. Es berechnet und plottet die Eigenenergien für variierende Kastenanzahlen bis zum oberen Limit max_wells. 
+
 Plots werden automatisch im plots-folder gespeichert -> Vorsicht vor Überschreibungen
+
 - GUI.py beinhaltet die GUI ohne Anbindung an den physikalischen Teil.
+
 
 Funktionalität:
 1. Es können beliebig viele Potentialkästen erstellt und die Eigenzustände gesucht werden. Dabei können Kastenabstand, Kastenbreite und Kastentiefe individuell variiert werden.
@@ -25,4 +33,6 @@ Achtung vor langen, leistungsintensiven Rechnungen. Die Nullstellensuche und die
 TODO:
 - Nullstellensuche in effizienterer Sprache o. generell effizientere Methode implementieren.
 - Eventuell Zeitentwicklung der ungebundenen Zustände (v.a. für periodische Wände statt Kästen).
+- Realistischere Potentiale und kompliziertere Periodizitäten erlauben.
 - Stabileren ODE-Solver implementieren oder SGL-spezifische Methode wählen. 
+- Höhere Dimensionen implementieren.
