@@ -4,8 +4,6 @@ Ordnerstuktur:
 - paper: Paper, die bei der Erarbeitung hilfreich waren oder direkt in die Präsentation eingeflossen sind.
 - plots: Für die Präsentation erstellte Plots.
 - project: Unser gesamter Projektcode
-- .git: Übliche git-File
-- .idea: Übliche idea-file
 - Präsentation.pdf: Präsentation für den 15.02.23
 
 Wie das Programm genutzt wird:
